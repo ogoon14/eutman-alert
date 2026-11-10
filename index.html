@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="읏맨 배구알림">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>읏맨 배구 선예매 알림</title>
+<title>읏맨 배구 예매 알림</title>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
 :root{
@@ -267,6 +267,58 @@ body.dark .accordion-close{color:#ffcc9a}
 .tab-btn{white-space:nowrap!important;word-break:keep-all;letter-spacing:-.8px!important;font-size:clamp(9px,2.5vw,12px)!important;padding:12px 0!important;min-width:0;overflow:visible}
 @media(max-width:380px){.tab-btn{font-size:9px!important;letter-spacing:-1px!important}}
 
+/* 하단 고정 메뉴: 스크롤과 무관하게 화면 아래에 표시 */
+.wrap{padding-bottom:calc(132px + env(safe-area-inset-bottom,0px))}
+.tabbar{
+  position:fixed;
+  left:50%;
+  bottom:calc(8px + env(safe-area-inset-bottom,0px));
+  transform:translateX(-50%);
+  z-index:60;
+  width:calc(100% - 24px);
+  max-width:552px;
+  margin:0;
+  padding:6px!important;
+  border:1px solid #f5ba80;
+  border-radius:18px;
+  background:#ffe3bf;
+  box-shadow:0 8px 30px #713d2240;
+  -webkit-backdrop-filter:blur(12px);
+  backdrop-filter:blur(12px);
+}
+.tab-btn{min-height:48px!important;touch-action:manipulation}
+body.dark .tabbar{
+  background:#293b53;
+  border-color:#4c617b;
+  box-shadow:0 8px 30px #0009;
+}
+@media(max-width:380px){
+  .tabbar{width:calc(100% - 12px);padding:4px!important}
+  .tab-btn{font-size:9px!important;letter-spacing:-1px!important}
+}
+
+
+/* 읽기 편한 하단 탭: 12px 라벨, 아이콘/라벨 분리, 줄바꿈 없음 */
+.tabbar{gap:3px!important}
+.tabbar .tab-btn{
+  display:flex!important;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  min-width:0;
+  padding:7px 0!important;
+  font-size:12px!important;
+  line-height:1.1;
+  letter-spacing:-.35px!important;
+  white-space:nowrap!important;
+}
+.tabbar .nav-icon{display:block;font-size:18px;line-height:1.15}
+.tabbar .nav-label{display:block;font-size:12px;letter-spacing:-.35px;white-space:nowrap}
+@media(max-width:350px){
+  .tabbar .nav-label{font-size:11px;letter-spacing:-.55px}
+}
+
 </style>
 </head>
 <body>
@@ -281,7 +333,7 @@ body.dark .accordion-close{color:#ffcc9a}
 
   <section class="hero">
     <div class="hero-top">🏐 2026–2027 V-리그 · OK저축은행 읏맨</div>
-    <div class="hero-title-row"><h1>OK저축은행<br>배구 선예매</h1><button class="app-reload" id="appReload" type="button" title="앱 전체 새로고침" aria-label="앱 전체 새로고침">⟳</button></div>
+    <div class="hero-title-row"><h1>OK저축은행 읏맨 배구단<br></h1><button class="app-reload" id="appReload" type="button" title="앱 전체 새로고침" aria-label="앱 전체 새로고침">⟳</button></div>
     <p>홈경기 일반예매·선예매 일정과 선택한 푸시 알림을 한 번에 확인해요.</p>
     <div class="mini">선예매 D-7 · 일반예매 D-5 오전 11시 · 10분 전 + 정각 알림</div>
   </section>
@@ -306,11 +358,11 @@ body.dark .accordion-close{color:#ffcc9a}
   <div class="schedule-refresh-row"><button class="button" id="check" type="button">🔄 일정 새로고침</button></div>
 
   <nav class="tabbar" role="tablist" aria-label="배구 앱 메뉴">
-    <button class="tab-btn active" id="tab-general" data-tab="general" role="tab" aria-selected="true">🎫 일반예매</button>
-    <button class="tab-btn" id="tab-ticket" data-tab="ticket" role="tab" aria-selected="false">🎟️ 선예매</button>
-    <button class="tab-btn" id="tab-all" data-tab="all" role="tab" aria-selected="false">🏐 전체 일정</button>
-    <button class="tab-btn" id="tab-ranking" data-tab="ranking" role="tab" aria-selected="false">🏆 현재 순위</button>
-    <button class="tab-btn" id="tab-attendance" data-tab="attendance" role="tab" aria-selected="false">📊 직관 승률</button>
+    <button class="tab-btn active" id="tab-general" data-tab="general" role="tab" aria-selected="true"><span class="nav-icon" aria-hidden="true">🎫</span><span class="nav-label">일반예매</span></button>
+    <button class="tab-btn" id="tab-ticket" data-tab="ticket" role="tab" aria-selected="false"><span class="nav-icon" aria-hidden="true">🎟️</span><span class="nav-label">선예매</span></button>
+    <button class="tab-btn" id="tab-all" data-tab="all" role="tab" aria-selected="false"><span class="nav-icon" aria-hidden="true">🏐</span><span class="nav-label">전체 일정</span></button>
+    <button class="tab-btn" id="tab-ranking" data-tab="ranking" role="tab" aria-selected="false"><span class="nav-icon" aria-hidden="true">🏆</span><span class="nav-label">현재 순위</span></button>
+    <button class="tab-btn" id="tab-attendance" data-tab="attendance" role="tab" aria-selected="false"><span class="nav-icon" aria-hidden="true">📊</span><span class="nav-label">직관 승률</span></button>
   </nav>
   <section class="tab-panel" id="panel-general" role="tabpanel" aria-labelledby="tab-general">
     <div class="sectiontitle">홈경기 일반예매 일정</div>
@@ -356,7 +408,7 @@ body.dark .accordion-close{color:#ffcc9a}
 
 <div class="modal-backdrop" id="popup" role="dialog" aria-modal="true" aria-labelledby="popTitle">
   <div class="modal">
-    <h2 id="popTitle">🏐 배구 선예매 알림</h2>
+    <h2 id="popTitle">🏐 배구 예매 알림</h2>
     <p id="popText"></p>
     <div class="controls">
       <a class="button primary" id="popupLink" href="https://www.kovo.co.kr/" target="_blank" rel="noopener">예매하러 가기</a>
