@@ -181,6 +181,21 @@ body.dark .ranking-table th{background:#344864;color:#ffdaaa}
 body.dark .ranking-table td{border-bottom-color:#3d516b}
 body.dark .ranking-table tr.mine{background:#4a392e;color:#ffc486}
 body.dark .standings-wrap{border-color:#4a617e}
+
+/* 원정경기와 직관 확정 경기 구분 */
+.card.away-card{background:linear-gradient(145deg,#eef3fb,#e0eaf7);border-color:#abc0dc;box-shadow:0 8px 22px #638db72b}
+.card.booked-card{background:linear-gradient(145deg,#e9e4df,#dcd6cf);border-color:#b9aaa0;box-shadow:inset 0 0 0 1px #ffffff65;opacity:.88}
+.card.booked-card .date{color:#605850}
+.card.booked-card .ticket{background:#e6dcd1;border-color:#cfc2b4}
+.booked-note{display:inline-block;margin-top:10px;padding:6px 9px;border-radius:9px;background:#fff9ed;color:#88612a;font-size:12px;font-weight:850}
+body.dark .card.away-card{background:linear-gradient(145deg,#273c54,#1f334b);border-color:#516b86;box-shadow:none}
+body.dark .card.booked-card{background:linear-gradient(145deg,#41464e,#333b45);border-color:#67717a;box-shadow:none;opacity:.9}
+body.dark .card.booked-card .date{color:#e0d2c3}
+body.dark .card.booked-card .ticket{background:#4a4540;border-color:#6c625a}
+body.dark .booked-note{background:#564d3c;color:#ffe1a0}
+.ranking-feedback{font-size:12px;font-weight:700;min-height:1.5em;margin:8px 0;color:#96520f}
+body.dark .ranking-feedback{color:#ffd09d}
+
 </style>
 </head>
 <body>
@@ -216,7 +231,7 @@ body.dark .standings-wrap{border-color:#4a617e}
     <div class="sectiontitle">홈경기 선예매 일정</div>
     <div class="controls"><select id="filter" aria-label="홈경기 필터"><option value="upcoming">예정 경기</option><option value="all">전체 경기</option></select><a class="link-button" href="https://www.kovo.co.kr/" target="_blank" rel="noopener">🎟️ 예매 사이트</a></div>
     <div id="games" aria-live="polite"></div>
-    <p class="tab-note">홈경기만 선예매 D-7 오전 11시를 표시해요. 선예매 정책은 변경될 수 있으므로 공식 예매처에서 확인해 주세요.</p>
+    <p class="tab-note">예매 완료를 체크하면 회색으로 표시되고 경기 2시간 전 직관 알림 대상이 돼요. 홈경기 선예매는 D-7 오전 11시 기준이며 공식 예매처에서 최종 확인하세요.</p>
   </section>
   <section class="tab-panel" id="panel-all" role="tabpanel" aria-labelledby="tab-all" hidden>
     <div class="sectiontitle">2026–2027 전체 경기 일정</div>
@@ -227,9 +242,10 @@ body.dark .standings-wrap{border-color:#4a617e}
   <section class="tab-panel" id="panel-ranking" role="tabpanel" aria-labelledby="tab-ranking" hidden>
     <div class="sectiontitle">남자부 팀 순위</div>
     <p id="rankingDate" class="tab-note">순위 자료를 불러오는 중...</p>
+    <p id="rankingFeedback" class="ranking-feedback" role="status"></p>
     <div id="rankingRows" class="standings-wrap"></div>
     <p class="tab-note">공식 구단 순위를 주기적으로 확인해 자동 반영합니다. 최신 경기 결과 반영에는 시간이 걸릴 수 있고 GitHub 자동 갱신이 실패하면 마지막 정상 순위가 표시됩니다.</p>
-    <div class="controls"><button class="button" id="refreshRanking" type="button">🔄 순위 새로고침</button><a class="link-button" href="https://beaverstats.com/kovo/standings?lang=ko" target="_blank" rel="noopener">📊 다른 순위 사이트</a><a class="link-button" href="https://www.okfinancialsports.com/volleyball/game/team_ranking.asp" target="_blank" rel="noopener">공식 구단 순위</a></div>
+    <div class="controls"><button class="button" id="refreshRanking" type="button">🔄 순위 다시 확인</button><a class="link-button" href="https://beaverstats.com/kovo/standings?lang=ko" target="_blank" rel="noopener">📊 다른 순위 사이트</a><a class="link-button" href="https://www.okfinancialsports.com/volleyball/game/team_ranking.asp" target="_blank" rel="noopener">공식 구단 순위</a></div>
   </section>
   <p class="small footer-note">※ 일정은 구단 공식 경기표를 바탕으로 작성한 <code>schedule.json</code> 기준입니다. 날짜·경기장·예매 정책은 변경될 수 있으므로 공식 사이트에서 확인하세요. 푸시 알림은 OneSignal 및 Apps Script 설정이 완료돼야 작동합니다.</p>
 </main>
@@ -239,7 +255,7 @@ body.dark .standings-wrap{border-color:#4a617e}
     <h2 id="popTitle">🏐 배구 선예매 알림</h2>
     <p id="popText"></p>
     <div class="controls">
-      <a class="button primary" href="https://www.kovo.co.kr/" target="_blank" rel="noopener">예매하러 가기</a>
+      <a class="button primary" id="popupLink" href="https://www.kovo.co.kr/" target="_blank" rel="noopener">예매하러 가기</a>
       <button class="button" id="close">닫기</button>
     </div>
   </div>
@@ -272,16 +288,38 @@ function parsed(date,time){return new Date(`${date}T${time}:00+09:00`)}
 function bookingDate(g){return new Date(parsed(g.date,'11:00').getTime()-7*86400000)}
 function fmt(d,includeTime=true){return new Intl.DateTimeFormat('ko-KR',{timeZone:KST,year:'numeric',month:'long',day:'numeric',weekday:'short',...(includeTime?{hour:'2-digit',minute:'2-digit',hour12:false}:{})}).format(d)}
 function escapeHTML(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function booked(g){return localStorage.getItem('booked_'+g.id)==='1'}
+function attendTag(g){return 'attend_'+g.id}
+function syncAttendTag(g){
+  if(!pushSDK || pushState!=='ready')return;
+  try{
+    if(booked(g))pushSDK.User.addTag(attendTag(g),'yes');
+    else pushSDK.User.removeTag(attendTag(g));
+  }catch(e){console.warn('직관 알림 태그 동기화 실패',e)}
+}
+function syncAllAttending(){games.filter(g=>g.home&&booked(g)).forEach(syncAttendTag)}
 function gameCard(g,ticketOnly=false){
   const buy=bookingDate(g),now=new Date(),passed=buy<=now,imminent=buy.getTime()-now.getTime()<86400000&&!passed;
+  const mine=g.home&&booked(g);
   const badge=g.home?'<span class="home-badge">HOME</span>':'<span class="away-badge">AWAY</span>';
   const ticket=g.home?`<div class="ticket ${passed?'past':imminent?'soon':''}">🎟️ 선예매 <strong>${fmt(buy)}</strong><br>${passed?'선예매 오픈 시각 지남':imminent?'24시간 이내 시작':'경기 7일 전 오전 11시'}</div>`:'';
-  const controls=g.home?`<div class="controls" style="margin-top:12px"><button class="button" data-calendar="${escapeHTML(g.id)}">📅 선예매 캘린더 등록</button><label class="button check-row"><input type="checkbox" data-booked="${escapeHTML(g.id)}" ${localStorage.getItem('booked_'+g.id)==='1'?'checked':''}> 예매 완료</label></div>`:'';
-  return `<article class="card"><div class="top"><div class="date">🏐 ${escapeHTML(g.opponent)}전</div>${badge}</div><div class="sub">${g.round?g.round+'라운드 · ':''}📅 ${fmt(parsed(g.date,g.time))}</div><div class="sub">📍 ${escapeHTML(g.venue||'장소 확인 필요')}</div>${g.result?`<span class="score-result">결과: ${escapeHTML(g.result)}</span>`:''}${g.home?ticket:''}${controls}</article>`;
+  const controls=g.home?`<div class="controls" style="margin-top:12px"><button class="button" data-calendar="${escapeHTML(g.id)}">📅 선예매 캘린더 등록</button><label class="button check-row"><input type="checkbox" data-booked="${escapeHTML(g.id)}" ${mine?'checked':''}> 예매 완료</label>${mine?`<button class="button" data-attend-calendar="${escapeHTML(g.id)}">⏰ 직관 2시간 전 캘린더 알림</button>`:''}</div>`:'';
+  return `<article class="card ${g.home?'':'away-card'} ${mine?'booked-card':''}"><div class="top"><div class="date">🏐 ${escapeHTML(g.opponent)}전</div>${badge}</div><div class="sub">${g.round?g.round+'라운드 · ':''}📅 ${fmt(parsed(g.date,g.time))}</div><div class="sub">📍 ${escapeHTML(g.venue||'장소 확인 필요')}</div>${g.result?`<span class="score-result">결과: ${escapeHTML(g.result)}</span>`:''}${mine?'<div class="booked-note">✅ 예매 완료 · 경기 2시간 전 직관 알림 대상</div>':''}${ticket}${controls}</article>`;
 }
 function attachCards(){
-  document.querySelectorAll('[data-booked]').forEach(n=>n.addEventListener('change',()=>localStorage.setItem('booked_'+n.dataset.booked,n.checked?'1':'0')));
+  document.querySelectorAll('[data-booked]').forEach(n=>n.addEventListener('change',()=>{
+    const g=games.find(x=>x.id===n.dataset.booked);if(!g)return;
+    localStorage.setItem('booked_'+g.id,n.checked?'1':'0');
+    syncAttendTag(g);
+    draw();
+    if(n.checked){
+      popup('✅ 직관 일정 등록',`${g.opponent}전 예매 완료! ${fmt(parsed(g.date,g.time))} 경기 시작 2시간 전에 알림을 보내도록 등록했어요. 잠금 화면 푸시는 알림 구독이 켜져 있어야 하며, 캘린더 알림도 함께 등록하면 더 안전해요.`,false);
+    }else{
+      popup('직관 일정 해제',`${g.opponent}전 예매 완료 체크를 해제했어요. 경기 2시간 전 직관 알림 대상에서도 제외됩니다.`,false);
+    }
+  }));
   document.querySelectorAll('[data-calendar]').forEach(n=>n.addEventListener('click',()=>downloadICS(games.find(g=>g.id===n.dataset.calendar))));
+  document.querySelectorAll('[data-attend-calendar]').forEach(n=>n.addEventListener('click',()=>downloadAttendICS(games.find(g=>g.id===n.dataset.attendCalendar))));
 }
 function draw(){
   const now=new Date(),f=el('filter').value,fa=el('allFilter').value;
@@ -293,16 +331,27 @@ function draw(){
   el('allGames').innerHTML=all.map(g=>gameCard(g)).join('')||'<div class="empty">표시할 경기가 없어요.</div>';
   attachCards();
 }
-async function loadRanking(){
+let lastRankingFingerprint='';
+async function loadRanking(manual=false){
+  const btn=el('refreshRanking');
+  if(manual){btn.disabled=true;btn.textContent='⏳ 순위 확인 중…';el('rankingFeedback').textContent='GitHub에 저장된 최신 순위 파일을 다시 확인하고 있어요.'}
   try{
     const res=await fetch('./standings.json?v='+Date.now(),{cache:'no-store'});
     if(!res.ok)throw new Error('HTTP '+res.status);
     const data=await res.json();
     if(!Array.isArray(data.teams))throw new Error('순위 형식 오류');
+    const fingerprint=JSON.stringify(data.teams)+'|'+(data.fetchedAt||data.asOf||'');
+    const changed=lastRankingFingerprint && lastRankingFingerprint!==fingerprint;
+    lastRankingFingerprint=fingerprint;
     const updated=data.fetchedAt ? new Date(data.fetchedAt).toLocaleString('ko-KR',{timeZone:'Asia/Seoul'}) : (data.asOf||'확인 필요');
     el('rankingDate').textContent=`${data.season||'2026–2027'} 시즌 · 마지막 자료 확인 ${updated} · 공식 자료 반영 시각과 다를 수 있음`;
     el('rankingRows').innerHTML='<table class="ranking-table"><thead><tr><th>순위</th><th>팀</th><th>경기</th><th>승</th><th>패</th><th>승점</th></tr></thead><tbody>'+data.teams.map(x=>`<tr class="${x.team==='OK저축은행'?'mine':''}"><td>${Number(x.rank)}</td><td>${escapeHTML(x.team)}</td><td>${Number(x.played)}</td><td>${Number(x.win)}</td><td>${Number(x.loss)}</td><td>${Number(x.points)}</td></tr>`).join('')+'</tbody></table>';
-  }catch(e){el('rankingRows').textContent='순위 자료를 불러오지 못했어요: '+e.message}
+    if(manual){
+      const checked=new Date().toLocaleTimeString('ko-KR',{timeZone:KST});
+      el('rankingFeedback').textContent=changed?`✅ ${checked} 새로운 순위 데이터를 불러왔어요!`:`✅ ${checked} 다시 확인했어요. GitHub 최신 저장 자료와 동일해요 (공식 순위 수집은 약 2시간 간격).`;
+    }
+  }catch(e){el('rankingFeedback').textContent='⚠️ 순위를 새로 확인하지 못했어요: '+e.message}
+  finally{btn.disabled=false;btn.textContent='🔄 순위 다시 확인'}
 }
 function utcICS(d){return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z')}
 function downloadICS(g){
@@ -312,16 +361,38 @@ function downloadICS(g){
   const url=URL.createObjectURL(new Blob([content],{type:'text/calendar;charset=utf-8'}));
   const a=document.createElement('a');a.href=url;a.download='eutman-'+g.date+'.ics';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)
 }
-function popup(msg){el('popText').textContent=msg;el('popup').style.display='flex'}
+function downloadAttendICS(g){
+  if(!g)return;
+  const t=parsed(g.date,g.time),end=new Date(t.getTime()+2*3600000),esc=v=>String(v).replace(/\\/g,'\\\\').replace(/,/g,'\\,').replace(/;/g,'\\;').replace(/\n/g,'\\n');
+  const content=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Eutman Attending//KR','BEGIN:VEVENT','UID:'+g.id+'-attend@local','DTSTAMP:'+utcICS(new Date()),'DTSTART:'+utcICS(t),'DTEND:'+utcICS(end),'SUMMARY:'+esc('읏맨 직관: '+g.opponent+'전'),'LOCATION:'+esc(g.venue||''),'DESCRIPTION:'+esc('직관 경기 시작 2시간 전 알림'),'BEGIN:VALARM','TRIGGER:-PT2H','ACTION:DISPLAY','DESCRIPTION:읏맨 경기 시작 2시간 전!','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const url=URL.createObjectURL(new Blob([content],{type:'text/calendar;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.download='eutman-attend-'+g.date+'.ics';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
+}
+function popup(title,msg,showLink=true){
+  el('popTitle').textContent=title;
+  el('popText').textContent=msg;
+  el('popupLink').style.display=showLink?'':'none';
+  el('popup').style.display='flex';
+}
 function checkPopup(){
   const now=Date.now(),key='popup_'+new Date().toLocaleDateString('en-CA',{timeZone:KST});
   for(const g of games){
     if(!g.home)continue;
-    const t=bookingDate(g).getTime(),delta=now-t,phase=delta<0?'before':'open',popupKey=key+g.id+'_'+phase;
-    if(delta>=-600000&&delta<3600000&&localStorage.getItem(popupKey)!=='1'&&localStorage.getItem('booked_'+g.id)!=='1'){
-      popup(`${g.opponent}전 선예매 ${delta<0?'10분 전! 예매 준비하세요!':'시작! 지금 바로 예매하러 가도 돼요.'}`);
+    const t=parsed(g.date,g.time).getTime();
+    if(booked(g)){
+      const reminder=t-2*3600000,doneKey='attend_popup_'+g.id;
+      if(now>=reminder&&now<reminder+15*60000&&localStorage.getItem(doneKey)!=='1'){
+        localStorage.setItem(doneKey,'1');
+        popup('🏐 직관 출발 준비!',`${g.opponent}전 시작 2시간 전이에요! ${g.venue||'경기장'}으로 출발할 준비하세요.`,false);
+        return;
+      }
+      continue;
+    }
+    const start=bookingDate(g).getTime(),delta=now-start,phase=delta<0?'before':'open',popupKey=key+g.id+'_'+phase;
+    if(delta>=-600000&&delta<3600000&&localStorage.getItem(popupKey)!=='1'){
       localStorage.setItem(popupKey,'1');
-      break;
+      popup('🎟️ 선예매 알림',`${g.opponent}전 선예매 ${delta<0?'10분 전! 예매 준비하세요!':'시작! 지금 바로 예매하러 가도 돼요.'}`,true);
+      return;
     }
   }
 }
@@ -332,7 +403,7 @@ async function load(){
     const list=await r.json();
     if(!Array.isArray(list))throw Error('형식 오류');
     games=list.filter(g=>/^\d{4}-\d{2}-\d{2}$/.test(g.date)&&/^\d{2}:\d{2}$/.test(g.time)&&g.id&&g.opponent);
-    draw();checkPopup()
+    draw();syncAllAttending();checkPopup()
   }catch(e){el('games').textContent='일정을 불러오지 못했습니다: '+e.message}
 }
 // 버튼은 OneSignal 초기화 전에도 즉시 반응하도록 먼저 등록합니다.
@@ -340,40 +411,51 @@ let pushSDK=null;
 let pushState='loading';
 const pushStatus=message=>{el('status').textContent=message};
 const isInstalled=()=>window.navigator.standalone===true || window.matchMedia('(display-mode: standalone)').matches;
+function refreshPushButton(){
+  const subscribed=pushSDK?.User?.PushSubscription?.optedIn===true;
+  el('enable').textContent=subscribed?'🔕 잠금 화면 알림 끄기':'🔔 잠금 화면 알림 켜기';
+  el('enable').setAttribute('aria-pressed',String(subscribed));
+  return subscribed;
+}
 el('enable').addEventListener('click',async()=>{
   if(!isInstalled() && /iPad|iPhone|iPod/.test(navigator.userAgent)){
-    pushStatus('📱 아이폰 Safari에서 공유 → 홈 화면에 추가한 뒤, 홈 화면 아이콘으로 앱을 열어주세요. Safari 탭에서는 푸시 권한을 요청할 수 없어요.');
-    return;
+    pushStatus('📱 아이폰 Safari에서 공유 → 홈 화면에 추가 후, 홈 화면 아이콘으로 앱을 열어주세요.');return;
   }
   if(!('Notification' in window) || !('serviceWorker' in navigator)){
-    pushStatus('⚠️ 현재 브라우저에서 웹 푸시를 사용할 수 없어요. 아이폰 iOS 16.4 이상에서 홈 화면 앱으로 실행해 주세요.');
-    return;
+    pushStatus('⚠️ 현재 브라우저에서 웹 푸시를 사용할 수 없어요.');return;
   }
   if(pushState!=='ready' || !pushSDK){
-    pushStatus(pushState==='error'?'⚠️ OneSignal 연결에 실패했어요. 페이지를 새로고침한 뒤 다시 확인해 주세요.':'⏳ 푸시 알림 서비스를 연결하는 중이에요. 연결이 완료된 후 다시 눌러주세요.');
+    pushStatus(pushState==='error'?'⚠️ OneSignal 연결 실패. 새로고침 후 다시 시도하세요.':'⏳ OneSignal 연결 중이에요.');return;
+  }
+  if(pushSDK.User.PushSubscription.optedIn===true){
+    try{
+      await pushSDK.User.PushSubscription.optOut();
+      refreshPushButton();
+      pushStatus('🔕 잠금 화면 푸시 알림 구독 해제 완료');
+      popup('🔕 팝업 알림 해제되었습니다.','이 기기의 푸시 알림 구독을 껐어요. 다시 버튼을 누르면 구독할 수 있어요. 앱을 열었을 때 표시되는 내부 알림은 별도예요.',false);
+    }catch(error){pushStatus('⚠️ 구독 해제 실패: '+(error?.message||String(error)))}
     return;
   }
   if(!pushSDK.Notifications.isPushSupported()){
-    pushStatus('⚠️ 이 환경은 푸시 알림을 지원하지 않아요. 아이폰에서는 Safari → 홈 화면에 추가 후 홈 화면에서 실행해 주세요.');
-    return;
+    pushStatus('⚠️ 이 환경은 푸시 알림을 지원하지 않아요.');return;
   }
   if(Notification.permission==='denied'){
-    pushStatus('⚠️ 알림이 차단되어 있어요. 아이폰 설정 → 알림 → 읏맨 배구 알리미에서 알림을 허용해 주세요.');
-    return;
+    pushStatus('⚠️ 아이폰 설정 → 알림에서 알림 허용을 켜주세요.');return;
   }
-  pushStatus('🔔 알림 권한을 요청하고 있어요…');
+  pushStatus('🔔 알림 구독을 설정하고 있어요…');
   try{
-    // 권한 요청은 반드시 사용자 클릭 이벤트 내부에서 직접 시작합니다.
     const allowed=await pushSDK.Notifications.requestPermission();
     if(!allowed && Notification.permission!=='granted'){
-      pushStatus('알림이 허용되지 않았어요. 아이폰 알림 권한을 확인해 주세요.');
-      return;
+      pushStatus('알림 권한이 허용되지 않았어요.');return;
     }
     await pushSDK.User.PushSubscription.optIn();
-    pushStatus(pushSDK.User.PushSubscription.optedIn?'✅ 잠금 화면 푸시 알림 구독 완료!':'⚠️ 권한은 허용됐지만 구독이 완료되지 않았어요. 새로고침 후 다시 시도해 주세요.');
-  }catch(error){
-    pushStatus('⚠️ 알림 설정 오류: '+(error?.message||String(error)));
-  }
+    const done=refreshPushButton();
+    if(done){
+      syncAllAttending();
+      pushStatus('✅ 잠금 화면 푸시 알림 구독 완료!');
+      popup('🔔 알림 구독 완료','선예매 알림과 예매 완료한 경기의 2시간 전 직관 알림을 받을 수 있도록 설정했어요. (Apps Script의 최신 Code.gs 적용 필요)',false);
+    }else pushStatus('⚠️ 구독이 완료되지 않았어요. 새로고침 후 다시 시도해 주세요.');
+  }catch(error){pushStatus('⚠️ 알림 설정 오류: '+(error?.message||String(error)))}
 });
 window.OneSignalDeferred=window.OneSignalDeferred||[];
 if(ONESIGNAL_APP_ID.startsWith('여기에')){
@@ -387,6 +469,9 @@ if(ONESIGNAL_APP_ID.startsWith('여기에')){
       await OneSignal.init({appId:ONESIGNAL_APP_ID,serviceWorkerPath:scope+'OneSignalSDKWorker.js',serviceWorkerParam:{scope},notifyButton:{enable:false},allowLocalhostAsSecureOrigin:false});
       pushSDK=OneSignal;
       pushState='ready';
+      refreshPushButton();
+      syncAllAttending();
+      OneSignal.User.PushSubscription.addEventListener('change',()=>refreshPushButton());
       pushStatus(OneSignal.User.PushSubscription.optedIn?'✅ 잠금 화면 푸시 알림 구독 중': '✅ 알림 연결 준비 완료! 위 버튼을 눌러 권한을 허용하세요.');
     }catch(error){
       pushState='error';
@@ -402,7 +487,7 @@ document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener(
   document.querySelectorAll('[data-tab]').forEach(tab=>{const active=tab===button;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active))});
   ['ticket','all','ranking'].forEach(tab=>el('panel-'+tab).hidden=tab!==name);
 }));
-el('refreshRanking').onclick=loadRanking;
+el('refreshRanking').onclick=()=>loadRanking(true);
 el('filter').onchange=draw;
 el('allFilter').onchange=draw;
 el('check').onclick=load;
