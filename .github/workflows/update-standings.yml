@@ -23,12 +23,12 @@ jobs:
         run: python scripts/update_standings.py
       - name: Commit updates if any
         run: |
-          if git diff --quiet -- standings.json; then
+          git add standings.json
+          if git diff --cached --quiet; then
             echo 'No data changes.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add standings.json
           git commit -m 'chore: update volleyball standings'
           git push
