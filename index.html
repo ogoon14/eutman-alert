@@ -244,6 +244,29 @@ body.dark .attend-choice button.loss{background:#5c343b;border-color:#b66c78;col
 body.dark .attend-help{color:#becfe1}
 @media(max-width:380px){.tab-btn{font-size:10px;padding:12px 1px}.attend-game{flex-direction:column;align-items:stretch}.attend-choice{justify-content:stretch}.attend-choice button{flex:1}}
 
+
+/* 알림 설정 아코디언: 설정은 접힌 상태로 시작합니다. */
+.notify-accordion{background:#fff9ee;border:1px solid #f5c88e;border-radius:17px;overflow:hidden;box-shadow:0 7px 18px #eeb16e20}
+.notify-accordion summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;min-height:48px;font-size:14px;font-weight:900;color:#87450f;cursor:pointer}
+.notify-accordion summary::-webkit-details-marker{display:none}
+.notify-accordion summary:focus-visible{outline:3px solid #f69a3a;outline-offset:-3px}
+.accordion-arrow{font-size:23px;line-height:1;transition:transform .18s}
+.notify-accordion[open] .accordion-arrow{transform:rotate(180deg)}
+.notify-accordion-body{padding:0 14px 14px}
+.notify-accordion-body>.button{width:100%;text-align:center}
+.notify-accordion .ticket-notify-settings{margin:12px 0}
+.notify-accordion .small{margin:8px 0 12px}
+.accordion-close{display:block;margin-left:auto;background:transparent;border:0;color:#98531a;font-weight:800;font-size:12px;cursor:pointer;padding:8px}
+.schedule-refresh-row{display:flex;justify-content:flex-end;margin:10px 1px 0}
+.schedule-refresh-row .button{width:auto;font-size:12px;padding:8px 11px;box-shadow:none}
+body.dark .notify-accordion{background:#213449;border-color:#526b82;box-shadow:none}
+body.dark .notify-accordion summary{color:#ffdcac}
+body.dark .accordion-close{color:#ffcc9a}
+/* 다섯 탭은 좁은 아이폰 화면에서도 줄바꿈 없이 한 줄 표시 */
+.tabbar{gap:3px!important;padding:4px!important;grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.tab-btn{white-space:nowrap!important;word-break:keep-all;letter-spacing:-.8px!important;font-size:clamp(9px,2.5vw,12px)!important;padding:12px 0!important;min-width:0;overflow:visible}
+@media(max-width:380px){.tab-btn{font-size:9px!important;letter-spacing:-1px!important}}
+
 </style>
 </head>
 <body>
@@ -264,19 +287,23 @@ body.dark .attend-help{color:#becfe1}
   </section>
 
   <div class="sectiontitle">알림 설정</div>
-  <div class="controls">
-    <button class="button primary" id="enable">🔔 잠금 화면 알림 켜기</button>
-    <button class="button" id="check" type="button">🔄 일정 새로고침</button>
-  </div>
-  <div class="ticket-notify-settings" aria-label="예매 알림 선택">
-    <strong>🔔 받고 싶은 예매 알림 선택</strong>
-    <div class="notify-options">
-      <label class="notify-option"><input type="checkbox" id="notifyGeneral"> 일반예매 알림</label>
-      <label class="notify-option"><input type="checkbox" id="notifyPresale"> 선예매 알림</label>
+  <details class="notify-accordion" id="notifyAccordion">
+    <summary><span>🔔 알림 설정 펼치기</span><span class="accordion-arrow" aria-hidden="true">⌄</span></summary>
+    <div class="notify-accordion-body">
+      <button class="button primary" id="enable" type="button">🔔 잠금 화면 알림 켜기</button>
+      <div class="ticket-notify-settings" aria-label="예매 알림 선택">
+        <strong>받고 싶은 예매 알림 선택</strong>
+        <div class="notify-options">
+          <label class="notify-option"><input type="checkbox" id="notifyGeneral"> 일반예매 알림</label>
+          <label class="notify-option"><input type="checkbox" id="notifyPresale"> 선예매 알림</label>
+        </div>
+        <p id="notifyInfo" class="notify-explain" role="status">원하는 알림을 체크해 주세요. 두 가지 모두 선택할 수 있어요.</p>
+      </div>
+      <p id="status" class="small">아이폰에서는 Safari에서 공유 → 홈 화면에 추가 후 앱을 열어 알림을 허용하세요.</p>
+      <button type="button" class="accordion-close" id="closeNotifySettings">설정 접기 ⌃</button>
     </div>
-    <p id="notifyInfo" class="notify-explain" role="status">원하는 알림을 체크해 주세요. 두 가지 모두 선택할 수 있어요.</p>
-  </div>
-  <p id="status" class="small">아이폰에서는 Safari에서 공유 → 홈 화면에 추가 후 앱을 열어 알림을 허용하세요.</p>
+  </details>
+  <div class="schedule-refresh-row"><button class="button" id="check" type="button">🔄 일정 새로고침</button></div>
 
   <nav class="tabbar" role="tablist" aria-label="배구 앱 메뉴">
     <button class="tab-btn active" id="tab-general" data-tab="general" role="tab" aria-selected="true">🎫 일반예매</button>
@@ -684,6 +711,7 @@ document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener(
   document.querySelectorAll('[data-tab]').forEach(tab=>{const active=tab===button;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active))});
   ['general','ticket','all','ranking','attendance'].forEach(tab=>el('panel-'+tab).hidden=tab!==name);
 }));
+el('closeNotifySettings').onclick=()=>{el('notifyAccordion').open=false};
 el('refreshRanking').onclick=()=>loadRanking(true);
 el('filter').onchange=draw;
 el('generalFilter').onchange=draw;
