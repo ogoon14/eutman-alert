@@ -212,6 +212,12 @@ body.dark .attend-recorded-date{color:#b2d4b6}
 .attend-stat .stat-label{display:block;color:#97602d;font-size:11px;font-weight:800}
 .attend-stat .stat-value{display:block;color:#e56811;font-size:25px;font-weight:900;margin:5px 0 2px}
 .attend-stat .stat-count{display:block;color:#856342;font-size:11px}
+.attend-stat .stat-games{display:block;font-size:16px;font-weight:900;color:#7b430f;margin-top:5px}
+.attend-total-count{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #f6cda1;border-radius:14px;padding:12px 15px;background:#fff5e8;margin:8px 0 10px;font-weight:850;color:#86501b}
+.attend-total-count strong{font-size:21px;color:#e56811}
+body.dark .attend-stat .stat-games{color:#ffd39a}
+body.dark .attend-total-count{background:#2c3c4e;border-color:#57667a;color:#ffe0b8}
+body.dark .attend-total-count strong{color:#ffb366}
 .attend-game{display:flex;align-items:center;gap:10px;justify-content:space-between;background:#fffefa;border:1px solid #f3d8b9;border-radius:16px;padding:12px;margin:9px 0}
 .attend-game.away{background:#edf4fc;border-color:#b5cde5}
 .attend-game .attend-detail{flex:1;min-width:0}
@@ -293,6 +299,7 @@ body.dark .attend-help{color:#becfe1}
   <section class="tab-panel" id="panel-attendance" role="tabpanel" aria-labelledby="tab-attendance" hidden>
     <div class="sectiontitle">🏐 나의 직관 승률</div>
     <p class="attend-help">경기 날짜를 확인하고 실제로 직관한 경기만 승리 또는 패배를 선택해 줘. 기록한 날짜도 자동 저장돼! 홈과 원정 기록이 따로 집계돼! 체크하지 않은 경기는 승률에서 제외돼.</p>
+    <div class="attend-total-count"><span>🏐 내가 직관한 경기 수</span><strong id="attendanceTotalCount" aria-live="polite">총 0경기</strong></div>
     <div class="attend-summary" id="attendanceSummary" aria-live="polite"></div>
     <div class="controls"><select id="attendanceFilter" aria-label="직관 경기 보기"><option value="past">지난 경기</option><option value="all">모든 경기</option><option value="home">홈경기</option><option value="away">원정경기</option><option value="recorded">기록한 경기</option></select></div>
     <div id="attendanceGames" aria-live="polite"></div>
@@ -407,12 +414,14 @@ function attendanceRate(list){
 }
 function statHTML(name,list){
   const {won,lost,total,pct}=attendanceRate(list);
-  return `<div class="attend-stat"><span class="stat-label">${name}</span><span class="stat-value">${total?pct+'%':'—'}</span><span class="stat-count">${won}승 ${lost}패 · ${total}경기</span></div>`;
+  return `<div class="attend-stat"><span class="stat-label">${name}</span><span class="stat-value">${total?pct+'%':'—'}</span><span class="stat-games">🏐 ${total}경기</span><span class="stat-count">${won}승 ${lost}패</span></div>`;
 }
 function drawAttendance(){
   const summary=el('attendanceSummary'),container=el('attendanceGames');
   if(!summary||!container)return;
+  const totalRecorded=attendanceRate(games).total;
   summary.innerHTML=statHTML('전체 직관',games)+statHTML('홈 직관',games.filter(g=>g.home))+statHTML('원정 직관',games.filter(g=>!g.home));
+  el('attendanceTotalCount').textContent=`총 ${totalRecorded}경기`;
   const filter=el('attendanceFilter').value,now=Date.now();
   const rows=games.filter(g=>filter==='all'||(filter==='past'&&parsed(g.date,g.time).getTime()<=now)||(filter==='home'&&g.home)||(filter==='away'&&!g.home)||(filter==='recorded'&&attendanceResult(g))).sort((a,b)=>parsed(b.date,b.time)-parsed(a.date,a.time));
   container.innerHTML=rows.map(g=>{
