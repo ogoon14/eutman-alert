@@ -9,10 +9,13 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
 <title>읏맨 배구 예매 알림</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
 :root{
-  font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
+  font-family:'Jua',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
   --bg1:#fff4df;
   --bg2:#ffe4bb;
   --accent:#ff8f2b;
@@ -24,6 +27,8 @@
   --line:#ffd6a5;
 }
 *{box-sizing:border-box}
+button,input,select,textarea{font:inherit}
+body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 body{
   margin:0;
   min-height:100vh;
@@ -329,15 +334,12 @@ body.dark .tabbar{
 }
 /* object-fit:cover와 같은 배치여서 어떤 아이폰에서도 위아래 경계선이 생기지 않습니다. */
 #appSplash .splash-stage{
-  position:absolute;left:50%;top:50%;
-  width:max(100vw,calc(100dvh * 850 / 930));
-  aspect-ratio:850 / 930;
-  transform:translate(-50%,-50%);
+  position:absolute;inset:0;
 }
 #appSplash .splash-stage img{display:block;width:100%;height:100%;object-fit:cover}
 #appSplash .splash-bell{
-  position:absolute;left:65.75%;top:67.40%;
-  width:7%;height:auto;aspect-ratio:1;
+  position:absolute;left:81%;top:66.4%;
+  width:8.2%;height:auto;aspect-ratio:1;
   transform-origin:50% 10%;
   animation:splash-bell-ring 850ms ease-in-out infinite;
   filter:drop-shadow(0 1px 1px #bd5b18a8);
@@ -356,7 +358,7 @@ body.dark .tabbar{
 <body>
 <div id="appSplash" aria-hidden="true">
   <div class="splash-stage">
-    <img src="./splash-ok.webp" alt="" fetchpriority="high">
+    <img src="./splash-ok.png" alt="" fetchpriority="high">
     <!-- 이미지에 박혀 있던 종 대신 독립된 SVG 종을 애니메이션 처리 -->
     <svg class="splash-bell" viewBox="0 0 64 64" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
       <path d="M32 9c-3.4 0-5.5 2.2-5.5 5.2-8.7 2.2-14.8 10-14.8 19.1v8.4c0 4.8-2.5 7.8-5.5 11.7-1.1 1.4-.1 3.3 1.7 3.3h45.8c1.8 0 2.8-1.9 1.7-3.3-3-3.9-5.5-6.9-5.5-11.7v-8.4c0-9.1-6.1-16.9-14.8-19.1C37.5 11.2 35.4 9 32 9Z" fill="none" stroke="#ffe04d" stroke-width="5" stroke-linejoin="round"/>
