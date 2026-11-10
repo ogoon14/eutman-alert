@@ -1,0 +1,64 @@
+{
+  "asOf": "2026-11-10",
+  "fetchedAt": "2026-11-10T10:16+09:00",
+  "season": "2026-2027",
+  "source": "https://www.okfinancialsports.com/volleyball/game/team_ranking.asp",
+  "teams": [
+    {
+      "rank": 1,
+      "team": "우리카드",
+      "played": 2,
+      "win": 2,
+      "loss": 0,
+      "points": 6
+    },
+    {
+      "rank": 2,
+      "team": "현대캐피탈",
+      "played": 3,
+      "win": 2,
+      "loss": 1,
+      "points": 6
+    },
+    {
+      "rank": 3,
+      "team": "대한항공",
+      "played": 2,
+      "win": 1,
+      "loss": 1,
+      "points": 3
+    },
+    {
+      "rank": 4,
+      "team": "삼성화재",
+      "played": 2,
+      "win": 1,
+      "loss": 1,
+      "points": 3
+    },
+    {
+      "rank": 5,
+      "team": "OK저축은행",
+      "played": 2,
+      "win": 1,
+      "loss": 1,
+      "points": 3
+    },
+    {
+      "rank": 6,
+      "team": "한국전력",
+      "played": 2,
+      "win": 1,
+      "loss": 1,
+      "points": 3
+    },
+    {
+      "rank": 7,
+      "team": "KB손해보험",
+      "played": 3,
+      "win": 0,
+      "loss": 3,
+      "points": 0
+    }
+  ]
+}
