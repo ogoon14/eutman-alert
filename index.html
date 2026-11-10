@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="읏맨 배구알림">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>읏맨 배구 예매 알림</title>
+<title>읏맨 배구 선예매 알림</title>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
 :root{
@@ -319,21 +319,51 @@ body.dark .tabbar{
   .tabbar .nav-label{font-size:11px;letter-spacing:-.55px}
 }
 
+
+/* 앱 시작 화면: 약 1초 표시 후 자동으로 사라집니다. */
+#appSplash{
+  position:fixed;inset:0;z-index:99999;
+  display:flex;align-items:center;justify-content:center;
+  background:#fa680a;opacity:1;visibility:visible;
+  transition:opacity .18s ease,visibility .18s ease;
+}
+#appSplash img{width:100%;height:100%;object-fit:contain;object-position:center;display:block}
+#appSplash.splash-done{opacity:0;visibility:hidden;pointer-events:none}
+@media(prefers-reduced-motion:reduce){#appSplash{transition:none}}
+
 </style>
 </head>
 <body>
+<div id="appSplash" aria-hidden="true"><img src="./splash-ok.webp" alt="" fetchpriority="high"></div>
+<script>
+// 별도 페이지 이동이 아닌 1초짜리 시작 화면입니다. 알림/기록 데이터는 그대로 유지됩니다.
+(function(){
+  const splash=document.getElementById('appSplash');
+  const showTime=1000;
+  const began=performance.now();
+  const closeSplash=()=>{
+    const remaining=Math.max(0,showTime-(performance.now()-began));
+    setTimeout(()=>{
+      splash.classList.add('splash-done');
+      setTimeout(()=>splash.remove(),250);
+    },remaining);
+  };
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',closeSplash,{once:true});
+  else closeSplash();
+})();
+</script>
 <main class="wrap">
   <header>
     <div class="brand-wrap">
-      <div class="brand">🏐 읏맨 배구 알리미 🏐</div>
-      <div class="brand-sub">OK저축은행 읏맨 · 경기 일정과 예매 일정 알림</div>
+      <div class="brand">🏐 읏맨 배구 알리미</div>
+      <div class="brand-sub">OK저축은행 읏맨 · 경기 일정과 선예매 알림</div>
     </div>
     <button class="tag theme-toggle" id="themeToggle" type="button" aria-label="어두운 모드로 전환" aria-pressed="false">🌙 어두운 버전</button>
   </header>
 
   <section class="hero">
-    <div class="hero-top">🏐 2026–2027 V-리그 · OK저축은행 읏맨 🏐</div>
-    <div class="hero-title-row"><h1>OK저축은행 읏맨 배구단<br></h1><button class="app-reload" id="appReload" type="button" title="앱 전체 새로고침" aria-label="앱 전체 새로고침">⟳</button></div>
+    <div class="hero-top">🏐 2026–2027 V-리그 · OK저축은행 읏맨</div>
+    <div class="hero-title-row"><h1>OK저축은행<br>배구 선예매</h1><button class="app-reload" id="appReload" type="button" title="앱 전체 새로고침" aria-label="앱 전체 새로고침">⟳</button></div>
     <p>홈경기 일반예매·선예매 일정과 선택한 푸시 알림을 한 번에 확인해요.</p>
     <div class="mini">선예매 D-7 · 일반예매 D-5 오전 11시 · 10분 전 + 정각 알림</div>
   </section>
@@ -408,7 +438,7 @@ body.dark .tabbar{
 
 <div class="modal-backdrop" id="popup" role="dialog" aria-modal="true" aria-labelledby="popTitle">
   <div class="modal">
-    <h2 id="popTitle">🏐 배구 예매 알림</h2>
+    <h2 id="popTitle">🏐 배구 선예매 알림</h2>
     <p id="popText"></p>
     <div class="controls">
       <a class="button primary" id="popupLink" href="https://www.kovo.co.kr/" target="_blank" rel="noopener">예매하러 가기</a>
@@ -585,7 +615,7 @@ async function loadRanking(manual=false){
     el('rankingRows').innerHTML='<table class="ranking-table"><thead><tr><th>순위</th><th>팀</th><th>경기</th><th>승</th><th>패</th><th>승점</th></tr></thead><tbody>'+data.teams.map(x=>`<tr class="${x.team==='OK저축은행'?'mine':''}"><td>${Number(x.rank)}</td><td>${escapeHTML(x.team)}</td><td>${Number(x.played)}</td><td>${Number(x.win)}</td><td>${Number(x.loss)}</td><td>${Number(x.points)}</td></tr>`).join('')+'</tbody></table>';
     if(manual){
       const checked=new Date().toLocaleTimeString('ko-KR',{timeZone:KST});
-      el('rankingFeedback').textContent=changed?`✅ ${checked} 새로운 순위 데이터를 불러왔어요!`:`✅ ${checked} 다시 확인했어요. 최신 저장 자료와 동일해요 (공식 순위 수집은 약 2시간 간격).`;
+      el('rankingFeedback').textContent=changed?`✅ ${checked} 새로운 순위 데이터를 불러왔어요!`:`✅ ${checked} 다시 확인했어요. GitHub 최신 저장 자료와 동일해요 (공식 순위 수집은 약 2시간 간격).`;
     }
   }catch(e){el('rankingFeedback').textContent='⚠️ 순위를 새로 확인하지 못했어요: '+e.message}
   finally{btn.disabled=false;btn.textContent='🔄 순위 다시 확인'}
@@ -669,7 +699,7 @@ async function load(manual=false){
     draw();syncAllAttending();checkPopup();
     if(manual){
       if(changed)popup('✅ 업데이트 되었습니다.',`${count}개 경기의 일정 또는 결과가 변경되어 반영됐어요. 선예매 날짜도 새 일정 기준으로 계산돼요.`,false);
-      else popup('📅 변경사항이 없습니다.','마지막으로 저장된 공식 경기표와 동일해요. 공식 홈페이지 비교는 약 1시간마다 자동 실행돼요.',false);
+      else popup('📅 변경사항이 없습니다.','GitHub에 마지막으로 저장된 공식 경기표와 동일해요. 공식 홈페이지 비교는 약 1시간마다 자동 실행돼요.',false);
     }
   }catch(e){
     if(!games.length)el('games').textContent='일정을 불러오지 못했습니다: '+e.message;
