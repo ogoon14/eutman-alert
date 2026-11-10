@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="읏맨 배구알림">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>읏맨 배구 선예매 알림</title>
+<title>읏맨 배구 예매 알림</title>
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <style>
 :root{
@@ -320,51 +320,97 @@ body.dark .tabbar{
 }
 
 
-/* 앱 시작 화면: 약 1초 표시 후 자동으로 사라집니다. */
+/* 앱 시작 화면: 전체 화면 이미지 + 움직이는 종 + 부드러운 페이드아웃 */
 #appSplash{
   position:fixed;inset:0;z-index:99999;
-  display:flex;align-items:center;justify-content:center;
-  background:#fa680a;opacity:1;visibility:visible;
-  transition:opacity .18s ease,visibility .18s ease;
+  overflow:hidden;background:#fc6a06;
+  opacity:1;visibility:visible;pointer-events:auto;
+  transition:opacity 520ms ease-in-out,visibility 520ms ease-in-out;
 }
-#appSplash img{width:100%;height:100%;object-fit:contain;object-position:center;display:block}
+/* object-fit:cover와 같은 배치여서 어떤 아이폰에서도 위아래 경계선이 생기지 않습니다. */
+#appSplash .splash-stage{
+  position:absolute;left:50%;top:50%;
+  width:max(100vw,calc(100dvh * 850 / 930));
+  aspect-ratio:850 / 930;
+  transform:translate(-50%,-50%);
+}
+#appSplash .splash-stage img{display:block;width:100%;height:100%;object-fit:cover}
+#appSplash .splash-bell{
+  position:absolute;left:65.75%;top:67.40%;
+  width:7%;height:auto;aspect-ratio:1;
+  transform-origin:50% 10%;
+  animation:splash-bell-ring 850ms ease-in-out infinite;
+  filter:drop-shadow(0 1px 1px #bd5b18a8);
+}
+@keyframes splash-bell-ring{
+  0%,100%{transform:translate(-50%,-50%) rotate(-13deg)}
+  25%{transform:translate(-50%,-50%) rotate(16deg)}
+  50%{transform:translate(-50%,-50%) rotate(-10deg)}
+  75%{transform:translate(-50%,-50%) rotate(11deg)}
+}
 #appSplash.splash-done{opacity:0;visibility:hidden;pointer-events:none}
-@media(prefers-reduced-motion:reduce){#appSplash{transition:none}}
+@media(prefers-reduced-motion:reduce){#appSplash .splash-bell{animation:none}}
 
 </style>
 </head>
 <body>
-<div id="appSplash" aria-hidden="true"><img src="./splash-ok.webp" alt="" fetchpriority="high"></div>
+<div id="appSplash" aria-hidden="true">
+  <div class="splash-stage">
+    <img src="./splash-ok.webp" alt="" fetchpriority="high">
+    <!-- 이미지에 박혀 있던 종 대신 독립된 SVG 종을 애니메이션 처리 -->
+    <svg class="splash-bell" viewBox="0 0 64 64" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+      <path d="M32 9c-3.4 0-5.5 2.2-5.5 5.2-8.7 2.2-14.8 10-14.8 19.1v8.4c0 4.8-2.5 7.8-5.5 11.7-1.1 1.4-.1 3.3 1.7 3.3h45.8c1.8 0 2.8-1.9 1.7-3.3-3-3.9-5.5-6.9-5.5-11.7v-8.4c0-9.1-6.1-16.9-14.8-19.1C37.5 11.2 35.4 9 32 9Z" fill="none" stroke="#ffe04d" stroke-width="5" stroke-linejoin="round"/>
+      <path d="M24 56c1.5 4 4.1 6 8 6s6.5-2 8-6M52 12c4 2 7 6 8 10M5 23c1-5 3-8 7-11" fill="none" stroke="#ffe04d" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+  </div>
+</div>
 <script>
-// 별도 페이지 이동이 아닌 1초짜리 시작 화면입니다. 알림/기록 데이터는 그대로 유지됩니다.
+// 전체 표시 약 2초(1.5초 유지 + 0.52초 페이드).
+// 앱 최소화 후 다시 열면 페이지 새로고침 없이 시작 화면만 재생됩니다.
 (function(){
   const splash=document.getElementById('appSplash');
-  const showTime=1000;
-  const began=performance.now();
-  const closeSplash=()=>{
-    const remaining=Math.max(0,showTime-(performance.now()-began));
-    setTimeout(()=>{
+  let timer=null;
+  let lastPlayed=0;
+  let wasBackgrounded=false;
+  function playSplash(){
+    if(document.visibilityState==='hidden')return;
+    const now=Date.now();
+    if(now-lastPlayed<700)return; // 중복 pageshow/focus 이벤트 방지
+    lastPlayed=now;
+    if(timer!==null)clearTimeout(timer);
+    splash.classList.remove('splash-done');
+    timer=setTimeout(()=>{
       splash.classList.add('splash-done');
-      setTimeout(()=>splash.remove(),250);
-    },remaining);
-  };
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',closeSplash,{once:true});
-  else closeSplash();
+      timer=null;
+    },1480);
+  }
+  playSplash();
+  document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='hidden')wasBackgrounded=true;
+    else if(wasBackgrounded){wasBackgrounded=false;playSplash()}
+  });
+  window.addEventListener('pagehide',()=>{wasBackgrounded=true});
+  window.addEventListener('pageshow',event=>{
+    if(event.persisted || wasBackgrounded){wasBackgrounded=false;playSplash()}
+  });
+  window.addEventListener('focus',()=>{
+    if(wasBackgrounded){wasBackgrounded=false;playSplash()}
+  });
 })();
 </script>
 <main class="wrap">
   <header>
     <div class="brand-wrap">
       <div class="brand">🏐 읏맨 배구 알리미</div>
-      <div class="brand-sub">OK저축은행 읏맨 · 경기 일정과 선예매 알림</div>
+      <div class="brand-sub">OK저축은행 읏맨 · 경기 일정과 예매 알림</div>
     </div>
     <button class="tag theme-toggle" id="themeToggle" type="button" aria-label="어두운 모드로 전환" aria-pressed="false">🌙 어두운 버전</button>
   </header>
 
   <section class="hero">
     <div class="hero-top">🏐 2026–2027 V-리그 · OK저축은행 읏맨</div>
-    <div class="hero-title-row"><h1>OK저축은행<br>배구 선예매</h1><button class="app-reload" id="appReload" type="button" title="앱 전체 새로고침" aria-label="앱 전체 새로고침">⟳</button></div>
-    <p>홈경기 일반예매·선예매 일정과 선택한 푸시 알림을 한 번에 확인해요.</p>
+    <div class="hero-title-row"><h1>OK저축은행 읏맨 배구단<br></h1><button class="app-reload" id="appReload" type="button" title="앱 전체 새로고침" aria-label="앱 전체 새로고침">⟳</button></div>
+    <p>홈경기 일반예매·선예매 일정과 직관기록도 한 번에 할 수 있어요.</p>
     <div class="mini">선예매 D-7 · 일반예매 D-5 오전 11시 · 10분 전 + 정각 알림</div>
   </section>
 
