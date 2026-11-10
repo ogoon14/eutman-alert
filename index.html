@@ -156,9 +156,9 @@ body.dark a{color:#ffba7a}
 body.dark select{background:#28394f;color:#f5e5d5;border-color:#53667d}
 body.dark .check-row input{accent-color:#ffa34a}
 
-/* 앱 안의 세 가지 탭 */
-.tabbar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:18px 0 14px;padding:5px;background:#ffdfb9;border-radius:18px}
-.tab-btn{border:0;border-radius:13px;padding:13px 5px;font-size:13px;font-weight:900;background:transparent;color:#894b18;cursor:pointer}
+/* 앱 안의 네 가지 탭 */
+.tabbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:18px 0 14px;padding:5px;background:#ffdfb9;border-radius:18px}
+.tab-btn{border:0;border-radius:13px;padding:12px 2px;font-size:12px;font-weight:900;background:transparent;color:#894b18;cursor:pointer}
 .tab-btn.active{background:#fff;color:#e9690c;box-shadow:0 5px 14px #cc803b36}
 .tab-panel[hidden]{display:none!important}
 .tab-note{font-size:12px;color:#84542c;line-height:1.65;margin:10px 0}
@@ -195,6 +195,48 @@ body.dark .card.booked-card .ticket{background:#4a4540;border-color:#6c625a}
 body.dark .booked-note{background:#564d3c;color:#ffe1a0}
 .ranking-feedback{font-size:12px;font-weight:700;min-height:1.5em;margin:8px 0;color:#96520f}
 body.dark .ranking-feedback{color:#ffd09d}
+/* 메인 제목 옆 작은 전체 새로고침 버튼 */
+.hero-title-row{display:flex;align-items:center;gap:10px}
+.hero-title-row h1{flex:0 1 auto}
+.app-reload{flex:none;display:inline-grid;place-items:center;width:37px;height:37px;padding:0;border:1px solid #ffffff83;border-radius:12px;background:#ffffff36;color:#fff;font-size:21px;font-weight:850;cursor:pointer;box-shadow:0 4px 12px #a4461f25}
+.app-reload:active{transform:rotate(45deg)}
+.app-reload:focus-visible{outline:3px solid white;outline-offset:2px}
+/* 직관 기록: 경기 날짜를 강조하고 기록한 날짜도 표시 */
+.attend-match-date{display:inline-flex;align-items:center;gap:5px;background:#ffedd3;color:#9a4a08;border:1px solid #ffd39c;border-radius:8px;padding:5px 8px;font-weight:900;font-size:13px;margin-bottom:7px}
+.attend-recorded-date{display:block;color:#6b805d;font-size:11px;font-weight:700;margin-top:5px}
+body.dark .attend-match-date{background:#493924;color:#ffd49c;border-color:#806043}
+body.dark .attend-recorded-date{color:#b2d4b6}
+/* 직관 기록 및 홈·원정 승률 */
+.attend-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:12px 0 14px}
+.attend-stat{background:#fffaf3;border:1px solid #f6cda1;border-radius:16px;padding:12px 6px;text-align:center}
+.attend-stat .stat-label{display:block;color:#97602d;font-size:11px;font-weight:800}
+.attend-stat .stat-value{display:block;color:#e56811;font-size:25px;font-weight:900;margin:5px 0 2px}
+.attend-stat .stat-count{display:block;color:#856342;font-size:11px}
+.attend-game{display:flex;align-items:center;gap:10px;justify-content:space-between;background:#fffefa;border:1px solid #f3d8b9;border-radius:16px;padding:12px;margin:9px 0}
+.attend-game.away{background:#edf4fc;border-color:#b5cde5}
+.attend-game .attend-detail{flex:1;min-width:0}
+.attend-game .attend-detail strong{font-size:14px;color:#77400d}
+.attend-game .attend-detail small{display:block;color:#927158;font-size:11px;line-height:1.55;margin-top:5px}
+.attend-choice{display:flex;gap:4px;flex:none}
+.attend-choice button{border:1px solid #e9c9a7;background:#fff7ee;border-radius:9px;padding:8px 8px;color:#7a4c24;font-size:12px;font-weight:850;cursor:pointer}
+.attend-choice button.win{background:#e2f5e9;border-color:#87caa1;color:#267b4e}
+.attend-choice button.loss{background:#fae1e1;border-color:#e8a7a7;color:#9f3c3c}
+.attend-choice button[aria-pressed="true"]{outline:2px solid #f98927;outline-offset:1px}
+.attend-game.is-win{border-left:5px solid #58b77c}
+.attend-game.is-loss{border-left:5px solid #df7777}
+.attend-help{font-size:12px;color:#835b36;line-height:1.65}
+body.dark .attend-stat{background:#26384f;border-color:#4a607b}
+body.dark .attend-stat .stat-label,body.dark .attend-stat .stat-count{color:#c6d5e5}
+body.dark .attend-stat .stat-value{color:#ffb366}
+body.dark .attend-game{background:#203249;border-color:#405a76}
+body.dark .attend-game.away{background:#273b56;border-color:#5a7492}
+body.dark .attend-game .attend-detail strong{color:#ffdfb5}
+body.dark .attend-game .attend-detail small{color:#cad7e8}
+body.dark .attend-choice button{background:#31445e;border-color:#58708b;color:#f7dfc2}
+body.dark .attend-choice button.win{background:#2d5545;border-color:#539a77;color:#d8fbe8}
+body.dark .attend-choice button.loss{background:#5c343b;border-color:#b66c78;color:#ffe0e0}
+body.dark .attend-help{color:#becfe1}
+@media(max-width:380px){.tab-btn{font-size:11px;padding:12px 1px}.attend-game{flex-direction:column;align-items:stretch}.attend-choice{justify-content:stretch}.attend-choice button{flex:1}}
 
 </style>
 </head>
@@ -210,7 +252,7 @@ body.dark .ranking-feedback{color:#ffd09d}
 
   <section class="hero">
     <div class="hero-top">🏐 2026–2027 V-리그 · OK저축은행 읏맨</div>
-    <h1>OK저축은행<br>배구 선예매</h1>
+    <div class="hero-title-row"><h1>OK저축은행<br>배구 선예매</h1><button class="app-reload" id="appReload" type="button" title="앱 전체 새로고침" aria-label="앱 전체 새로고침">⟳</button></div>
     <p>홈경기 일정, 선예매 시작 시각, 잠금 화면 푸시 알림까지 한 번에 확인해요.</p>
     <div class="mini">경기 D-7 오전 11시 · 10분 전 + 정각 푸시 알림</div>
   </section>
@@ -226,6 +268,7 @@ body.dark .ranking-feedback{color:#ffd09d}
     <button class="tab-btn active" id="tab-ticket" data-tab="ticket" role="tab" aria-selected="true">🎟️ 선예매</button>
     <button class="tab-btn" id="tab-all" data-tab="all" role="tab" aria-selected="false">🏐 전체 일정</button>
     <button class="tab-btn" id="tab-ranking" data-tab="ranking" role="tab" aria-selected="false">🏆 현재 순위</button>
+    <button class="tab-btn" id="tab-attendance" data-tab="attendance" role="tab" aria-selected="false">📊 직관 승률</button>
   </nav>
   <section class="tab-panel" id="panel-ticket" role="tabpanel" aria-labelledby="tab-ticket">
     <div class="sectiontitle">홈경기 선예매 일정</div>
@@ -247,17 +290,19 @@ body.dark .ranking-feedback{color:#ffd09d}
     <p class="tab-note">공식 구단 순위를 주기적으로 확인해 자동 반영합니다. 최신 경기 결과 반영에는 시간이 걸릴 수 있고 자동 갱신이 실패하면 마지막 정상 순위가 표시됩니다.</p>
     <div class="controls"><button class="button" id="refreshRanking" type="button">🔄 순위 다시 확인</button><a class="link-button" href="https://beaverstats.com/kovo/standings?lang=ko" target="_blank" rel="noopener">📊 다른 순위 사이트</a><a class="link-button" href="https://www.okfinancialsports.com/volleyball/game/team_ranking.asp" target="_blank" rel="noopener">공식 구단 순위</a></div>
   </section>
+  <section class="tab-panel" id="panel-attendance" role="tabpanel" aria-labelledby="tab-attendance" hidden>
+    <div class="sectiontitle">🏐 나의 직관 승률</div>
+    <p class="attend-help">경기 날짜를 확인하고 실제로 직관한 경기만 승리 또는 패배를 선택해 줘. 기록한 날짜도 자동 저장돼! 홈과 원정 기록이 따로 집계돼! 체크하지 않은 경기는 승률에서 제외돼.</p>
+    <div class="attend-summary" id="attendanceSummary" aria-live="polite"></div>
+    <div class="controls"><select id="attendanceFilter" aria-label="직관 경기 보기"><option value="past">지난 경기</option><option value="all">모든 경기</option><option value="home">홈경기</option><option value="away">원정경기</option><option value="recorded">기록한 경기</option></select></div>
+    <div id="attendanceGames" aria-live="polite"></div>
+    <p class="attend-help">※ 내 직관 기록은 이 기기의 브라우저 저장소에 보관돼. 휴대폰을 바꾸거나 앱 데이터를 삭제하면 기록이 사라질 수 있어. 원정경기도 자유롭게 기록할 수 있어.</p>
+  </section>
   <p class="small footer-note">※ 일정은 구단 공식 경기표를 주기적으로 비교해 갱신하는 <code>schedule.json</code> 기준입니다. 새로고침은 공식 사이트를 즉시 조회하지 않습니다. 날짜·경기장·예매 정책은 공식 사이트에서 최종 확인하세요. 푸시 알림은 OneSignal 및 Apps Script 설정이 완료돼야 작동합니다.</p>
-<footer style="margin-top:35px;padding:20px 12px;text-align:center;font-size:11px;line-height:1.8;color:#96785b;border-top:1px solid #e8d5ba;">
- 
-  🏐 OK저축은행 읏맨팬 제작 앱 🏐
-
-  <div>
-    본 앱은 개인 팬이 제작한 비공식 서비스로,<br>
-    OK저축은행 배구단 및 운영사와<br>
-    공식적인 제휴·후원 관계가 없습니다.
-  </div>
-</footer>
+  <footer style="margin-top:35px;padding:20px 12px;text-align:center;font-size:11px;line-height:1.8;color:inherit;opacity:.72;border-top:1px solid #d6b28b;">
+    🏐 OK저축은행 읏맨팬 제작 앱 🏐
+    <div>본 앱은 개인 팬이 제작한 비공식 서비스로,<br>OK저축은행 배구단 및 운영사와<br>공식적인 제휴·후원 관계가 없습니다.</div>
+  </footer>
 </main>
 
 <div class="modal-backdrop" id="popup" role="dialog" aria-modal="true" aria-labelledby="popTitle">
@@ -340,6 +385,47 @@ function draw(){
   el('games').innerHTML=home.map(g=>gameCard(g,true)).join('')||'<div class="empty">등록된 예정 홈경기가 없어요.</div>';
   el('allGames').innerHTML=all.map(g=>gameCard(g)).join('')||'<div class="empty">표시할 경기가 없어요.</div>';
   attachCards();
+  drawAttendance();
+}
+// 직관 승패 기록은 예매 완료 여부와 독립적으로 보관합니다.
+const attendanceKey=g=>'eutman_attendance_'+g.id;
+const attendanceSavedKey=g=>'eutman_attendance_saved_'+g.id;
+function attendanceSavedAt(g){
+  try{const v=localStorage.getItem(attendanceSavedKey(g));return v?new Date(v):null}catch(e){return null}
+}
+function matchDateLabel(g){
+  return new Intl.DateTimeFormat('ko-KR',{timeZone:KST,year:'numeric',month:'long',day:'numeric',weekday:'short'}).format(parsed(g.date,g.time));
+}
+function attendanceResult(g){
+  try {const v=localStorage.getItem(attendanceKey(g));return v==='win'||v==='loss'?v:''}catch(e){return ''}
+}
+function attendanceRate(list){
+  const won=list.filter(g=>attendanceResult(g)==='win').length;
+  const lost=list.filter(g=>attendanceResult(g)==='loss').length;
+  const total=won+lost;
+  return {won,lost,total,pct:total?Math.round(1000*won/total)/10:0};
+}
+function statHTML(name,list){
+  const {won,lost,total,pct}=attendanceRate(list);
+  return `<div class="attend-stat"><span class="stat-label">${name}</span><span class="stat-value">${total?pct+'%':'—'}</span><span class="stat-count">${won}승 ${lost}패 · ${total}경기</span></div>`;
+}
+function drawAttendance(){
+  const summary=el('attendanceSummary'),container=el('attendanceGames');
+  if(!summary||!container)return;
+  summary.innerHTML=statHTML('전체 직관',games)+statHTML('홈 직관',games.filter(g=>g.home))+statHTML('원정 직관',games.filter(g=>!g.home));
+  const filter=el('attendanceFilter').value,now=Date.now();
+  const rows=games.filter(g=>filter==='all'||(filter==='past'&&parsed(g.date,g.time).getTime()<=now)||(filter==='home'&&g.home)||(filter==='away'&&!g.home)||(filter==='recorded'&&attendanceResult(g))).sort((a,b)=>parsed(b.date,b.time)-parsed(a.date,a.time));
+  container.innerHTML=rows.map(g=>{
+    const value=attendanceResult(g),id=escapeHTML(g.id),past=parsed(g.date,g.time).getTime()<=now;
+    const savedAt=attendanceSavedAt(g), savedLabel=value?(savedAt&&!Number.isNaN(savedAt.getTime())?`📝 기록한 날짜: ${fmt(savedAt,false)}`:'📝 이전에 저장한 직관 기록'):'';
+    return `<article class="attend-game ${g.home?'':'away'} ${value==='win'?'is-win':value==='loss'?'is-loss':''}"><div class="attend-detail"><span class="attend-match-date">📅 ${escapeHTML(matchDateLabel(g))}</span><br><strong>${g.home?'🏠 홈':'🚌 원정'} · ${escapeHTML(g.opponent)}전</strong><small>경기 ${escapeHTML(g.time)} · ${escapeHTML(g.venue||'경기장 미정')}${!past?' · 예정 경기':''}</small>${value?`<span class="attend-recorded-date">${escapeHTML(savedLabel)}</span>`:''}</div><div class="attend-choice" role="group" aria-label="${escapeHTML(g.opponent)}전 직관 결과"><button type="button" data-attend-result="${id}" data-outcome="win" class="${value==='win'?'win':''}" aria-pressed="${value==='win'}">승리</button><button type="button" data-attend-result="${id}" data-outcome="loss" class="${value==='loss'?'loss':''}" aria-pressed="${value==='loss'}">패배</button><button type="button" data-attend-result="${id}" data-outcome="clear" aria-pressed="${value===''}">초기화</button></div></article>`;
+  }).join('')||'<div class="empty">표시할 경기가 없어요.</div>';
+  container.querySelectorAll('[data-attend-result]').forEach(btn=>btn.addEventListener('click',()=>{
+    const g=games.find(g=>g.id===btn.dataset.attendResult);if(!g)return;
+    const outcome=btn.dataset.outcome;
+    try{if(outcome==='clear'){localStorage.removeItem(attendanceKey(g));localStorage.removeItem(attendanceSavedKey(g));}else{localStorage.setItem(attendanceKey(g),outcome);localStorage.setItem(attendanceSavedKey(g),new Date().toISOString());}}catch(e){popup('⚠️ 기록 저장 실패','브라우저 저장 공간을 확인해 주세요.',false);return}
+    drawAttendance();
+  }));
 }
 let lastRankingFingerprint='';
 async function loadRanking(manual=false){
@@ -358,7 +444,7 @@ async function loadRanking(manual=false){
     el('rankingRows').innerHTML='<table class="ranking-table"><thead><tr><th>순위</th><th>팀</th><th>경기</th><th>승</th><th>패</th><th>승점</th></tr></thead><tbody>'+data.teams.map(x=>`<tr class="${x.team==='OK저축은행'?'mine':''}"><td>${Number(x.rank)}</td><td>${escapeHTML(x.team)}</td><td>${Number(x.played)}</td><td>${Number(x.win)}</td><td>${Number(x.loss)}</td><td>${Number(x.points)}</td></tr>`).join('')+'</tbody></table>';
     if(manual){
       const checked=new Date().toLocaleTimeString('ko-KR',{timeZone:KST});
-      el('rankingFeedback').textContent=changed?`✅ ${checked} 새로운 순위 데이터를 불러왔어요!`:`✅ ${checked} 다시 확인했어요. 최신 저장 자료와 동일해요 (공식 순위 수집은 약 2시간 간격).`;
+      el('rankingFeedback').textContent=changed?`✅ ${checked} 새로운 순위 데이터를 불러왔어요!`:`✅ ${checked} 다시 확인했어요. GitHub 최신 저장 자료와 동일해요 (공식 순위 수집은 약 2시간 간격).`;
     }
   }catch(e){el('rankingFeedback').textContent='⚠️ 순위를 새로 확인하지 못했어요: '+e.message}
   finally{btn.disabled=false;btn.textContent='🔄 순위 다시 확인'}
@@ -435,7 +521,7 @@ async function load(manual=false){
     draw();syncAllAttending();checkPopup();
     if(manual){
       if(changed)popup('✅ 업데이트 되었습니다.',`${count}개 경기의 일정 또는 결과가 변경되어 반영됐어요. 선예매 날짜도 새 일정 기준으로 계산돼요.`,false);
-      else popup('📅 변경사항이 없습니다.','마지막으로 저장된 공식 경기표와 동일해요. 공식 홈페이지 비교는 약 1시간마다 자동 실행돼요.',false);
+      else popup('📅 변경사항이 없습니다.','GitHub에 마지막으로 저장된 공식 경기표와 동일해요. 공식 홈페이지 비교는 약 1시간마다 자동 실행돼요.',false);
     }
   }catch(e){
     if(!games.length)el('games').textContent='일정을 불러오지 못했습니다: '+e.message;
@@ -525,12 +611,14 @@ if(ONESIGNAL_APP_ID.startsWith('여기에')){
 document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{
   const name=button.dataset.tab;
   document.querySelectorAll('[data-tab]').forEach(tab=>{const active=tab===button;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active))});
-  ['ticket','all','ranking'].forEach(tab=>el('panel-'+tab).hidden=tab!==name);
+  ['ticket','all','ranking','attendance'].forEach(tab=>el('panel-'+tab).hidden=tab!==name);
 }));
 el('refreshRanking').onclick=()=>loadRanking(true);
 el('filter').onchange=draw;
 el('allFilter').onchange=draw;
 el('check').onclick=()=>load(true);
+el('appReload').onclick=()=>window.location.reload();
+el('attendanceFilter').onchange=drawAttendance;
 el('close').onclick=()=>el('popup').style.display='none';
 el('popup').onclick=e=>{if(e.target===el('popup'))el('popup').style.display='none'};
 load();
