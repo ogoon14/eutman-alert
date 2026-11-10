@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ko">
 <head>
@@ -122,6 +123,39 @@ select{background:#fffaf3;color:#6f3b13;border:1px solid #ffc987;border-radius:1
   .button,.link-button{width:100%;justify-content:center;text-align:center}
   .controls > *{flex:1 1 100%}
 }
+
+/* 밝은 모드 / 어두운 모드 전환 */
+.theme-toggle{font-family:inherit;cursor:pointer;white-space:nowrap;transition:transform .2s,background .2s}
+.theme-toggle:active{transform:scale(.96)}
+.theme-toggle:focus-visible{outline:3px solid #ffbe71;outline-offset:3px}
+body.dark{
+  color:#f9efe4;
+  background:radial-gradient(circle at 80% 5%,#39475e 0%,transparent 31%),linear-gradient(180deg,#18283b,#111b2b 58%,#0c1726);
+}
+body.dark::before,body.dark::after{opacity:.09}
+body.dark .brand{color:#fff2df}
+body.dark .brand-sub{color:#f8ba76}
+body.dark .tag{background:#38485b;color:#ffdbac;border-color:#637084;box-shadow:none}
+body.dark .hero{background:linear-gradient(135deg,#f68c29,#ec631e 62%,#bd411a);box-shadow:0 18px 36px #0006}
+body.dark .sectiontitle{color:#fff0d8}
+body.dark .button,body.dark .link-button{background:#28394f;color:#f9ead7;border-color:#53667d;box-shadow:none}
+body.dark .button.primary{background:linear-gradient(130deg,#ffae46,#f37a24);color:#29180d;border-color:#f49c43}
+body.dark .card{background:#203149;border-color:#3c526e;box-shadow:0 10px 26px #0003}
+body.dark .date{color:#fff2e0}
+body.dark .home-badge{background:#4b3b31;color:#ffbe78;border-color:#80573c}
+body.dark .sub{color:#c8d5e6}
+body.dark .ticket{background:#343c4d;color:#f8e5ce;border-color:#5f6170}
+body.dark .ticket strong{color:#ffad61}
+body.dark .ticket.soon{background:#504034;border-color:#96704c}
+body.dark .small{color:#b5c6d8}
+body.dark .empty{color:#cfdef0;background:#1d2c41;border-color:#53667d}
+body.dark .modal-backdrop{background:#000a}
+body.dark .modal{background:linear-gradient(180deg,#23364e,#18283e);border-color:#53677e;box-shadow:0 20px 48px #0008}
+body.dark .modal h2{color:#ffbb79}
+body.dark .modal p{color:#e6eef8}
+body.dark a{color:#ffba7a}
+body.dark select{background:#28394f;color:#f5e5d5;border-color:#53667d}
+body.dark .check-row input{accent-color:#ffa34a}
 </style>
 </head>
 <body>
@@ -131,12 +165,12 @@ select{background:#fffaf3;color:#6f3b13;border:1px solid #ffc987;border-radius:1
       <div class="brand">🏐 읏맨 배구 알리미</div>
       <div class="brand-sub">OK저축은행 읏맨 홈경기 선예매 전용 앱</div>
     </div>
-    <span class="tag">밝은 배구앱</span>
+    <button class="tag theme-toggle" id="themeToggle" type="button" aria-label="어두운 모드로 전환" aria-pressed="false">🌙 어두운 버전</button>
   </header>
 
   <section class="hero">
     <div class="hero-top">🏐 2026–2027 V-리그 · OK저축은행 읏맨</div>
-    <h1>배구 선예매<br>ㄱㄱㄱㄱㄱ</h1>
+    <h1>OK저축은행<br>배구 선예매</h1>
     <p>홈경기 일정, 선예매 시작 시각, 잠금 화면 푸시 알림까지 한 번에 확인해요.</p>
     <div class="mini">경기 D-7 오전 11시 · 10분 전 + 정각 푸시 알림</div>
   </section>
@@ -178,6 +212,23 @@ const ONESIGNAL_APP_ID = '여기에_OneSignal_APP_ID';
 const KST='Asia/Seoul';
 let games=[];
 const el=id=>document.getElementById(id);
+
+// 사용자가 선택한 화면 테마는 이 기기에 저장합니다.
+const themeToggle=el('themeToggle');
+function setTheme(theme){
+  const dark=theme==='dark';
+  document.body.classList.toggle('dark',dark);
+  themeToggle.textContent=dark?'☀️ 밝은 버전':'🌙 어두운 버전';
+  themeToggle.setAttribute('aria-label',dark?'밝은 모드로 전환':'어두운 모드로 전환');
+  themeToggle.setAttribute('aria-pressed',String(dark));
+  document.querySelector('meta[name="theme-color"]').content=dark?'#18283b':'#ff8f2b';
+  try{localStorage.setItem('eutman_theme',theme)}catch(e){}
+}
+let savedTheme='light';
+try{savedTheme=localStorage.getItem('eutman_theme')==='dark'?'dark':'light'}catch(e){}
+setTheme(savedTheme);
+themeToggle.addEventListener('click',()=>setTheme(document.body.classList.contains('dark')?'light':'dark'));
+
 function parsed(date,time){return new Date(`${date}T${time}:00+09:00`)}
 function bookingDate(g){return new Date(parsed(g.date,'11:00').getTime()-7*86400000)}
 function fmt(d,includeTime=true){return new Intl.DateTimeFormat('ko-KR',{timeZone:KST,year:'numeric',month:'long',day:'numeric',weekday:'short',...(includeTime?{hour:'2-digit',minute:'2-digit',hour12:false}:{})}).format(d)}
