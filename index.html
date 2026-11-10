@@ -335,24 +335,67 @@ async function load(){
     draw();checkPopup()
   }catch(e){el('games').textContent='일정을 불러오지 못했습니다: '+e.message}
 }
+// 버튼은 OneSignal 초기화 전에도 즉시 반응하도록 먼저 등록합니다.
+let pushSDK=null;
+let pushState='loading';
+const pushStatus=message=>{el('status').textContent=message};
+const isInstalled=()=>window.navigator.standalone===true || window.matchMedia('(display-mode: standalone)').matches;
+el('enable').addEventListener('click',async()=>{
+  if(!isInstalled() && /iPad|iPhone|iPod/.test(navigator.userAgent)){
+    pushStatus('📱 아이폰 Safari에서 공유 → 홈 화면에 추가한 뒤, 홈 화면 아이콘으로 앱을 열어주세요. Safari 탭에서는 푸시 권한을 요청할 수 없어요.');
+    return;
+  }
+  if(!('Notification' in window) || !('serviceWorker' in navigator)){
+    pushStatus('⚠️ 현재 브라우저에서 웹 푸시를 사용할 수 없어요. 아이폰 iOS 16.4 이상에서 홈 화면 앱으로 실행해 주세요.');
+    return;
+  }
+  if(pushState!=='ready' || !pushSDK){
+    pushStatus(pushState==='error'?'⚠️ OneSignal 연결에 실패했어요. 페이지를 새로고침한 뒤 다시 확인해 주세요.':'⏳ 푸시 알림 서비스를 연결하는 중이에요. 연결이 완료된 후 다시 눌러주세요.');
+    return;
+  }
+  if(!pushSDK.Notifications.isPushSupported()){
+    pushStatus('⚠️ 이 환경은 푸시 알림을 지원하지 않아요. 아이폰에서는 Safari → 홈 화면에 추가 후 홈 화면에서 실행해 주세요.');
+    return;
+  }
+  if(Notification.permission==='denied'){
+    pushStatus('⚠️ 알림이 차단되어 있어요. 아이폰 설정 → 알림 → 읏맨 배구 알리미에서 알림을 허용해 주세요.');
+    return;
+  }
+  pushStatus('🔔 알림 권한을 요청하고 있어요…');
+  try{
+    // 권한 요청은 반드시 사용자 클릭 이벤트 내부에서 직접 시작합니다.
+    const allowed=await pushSDK.Notifications.requestPermission();
+    if(!allowed && Notification.permission!=='granted'){
+      pushStatus('알림이 허용되지 않았어요. 아이폰 알림 권한을 확인해 주세요.');
+      return;
+    }
+    await pushSDK.User.PushSubscription.optIn();
+    pushStatus(pushSDK.User.PushSubscription.optedIn?'✅ 잠금 화면 푸시 알림 구독 완료!':'⚠️ 권한은 허용됐지만 구독이 완료되지 않았어요. 새로고침 후 다시 시도해 주세요.');
+  }catch(error){
+    pushStatus('⚠️ 알림 설정 오류: '+(error?.message||String(error)));
+  }
+});
 window.OneSignalDeferred=window.OneSignalDeferred||[];
 if(ONESIGNAL_APP_ID.startsWith('여기에')){
-  el('status').textContent='푸시 알림 설정 전입니다. index.html에 OneSignal App ID를 입력하세요.'
+  pushState='error';
+  pushStatus('⚠️ OneSignal App ID가 아직 등록되지 않았어요.');
 }else{
+  pushStatus('⏳ OneSignal 연결 중…');
   window.OneSignalDeferred.push(async OneSignal=>{
     try{
       const scope=new URL('./',location.href).pathname;
       await OneSignal.init({appId:ONESIGNAL_APP_ID,serviceWorkerPath:scope+'OneSignalSDKWorker.js',serviceWorkerParam:{scope},notifyButton:{enable:false},allowLocalhostAsSecureOrigin:false});
-      el('status').textContent='알림 사용 가능: 버튼을 눌러 권한을 허용하세요.';
-      el('enable').onclick=async()=>{
-        try{
-          await OneSignal.Notifications.requestPermission();
-          await OneSignal.User.PushSubscription.optIn();
-          el('status').textContent=OneSignal.User.PushSubscription.optedIn?'✅ 잠금 화면 알림 구독 완료':'알림 권한이 허용되지 않았어요. 아이폰 알림 설정을 확인하세요.'
-        }catch(e){el('status').textContent='알림 설정 실패: '+e.message}
-      }
-    }catch(e){el('status').textContent='OneSignal 초기화 실패: '+e.message}
+      pushSDK=OneSignal;
+      pushState='ready';
+      pushStatus(OneSignal.User.PushSubscription.optedIn?'✅ 잠금 화면 푸시 알림 구독 중': '✅ 알림 연결 준비 완료! 위 버튼을 눌러 권한을 허용하세요.');
+    }catch(error){
+      pushState='error';
+      pushStatus('⚠️ OneSignal 연결 오류: '+(error?.message||String(error)));
+    }
   });
+  setTimeout(()=>{
+    if(pushState==='loading')pushStatus('⚠️ OneSignal 연결이 지연되고 있어요. GitHub의 서비스 워커 경로와 OneSignal Site URL 설정을 확인해 주세요.');
+  },10000);
 }
 document.querySelectorAll('[data-tab]').forEach(button=>button.addEventListener('click',()=>{
   const name=button.dataset.tab;
