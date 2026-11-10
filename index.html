@@ -585,7 +585,7 @@ async function loadRanking(manual=false){
     el('rankingRows').innerHTML='<table class="ranking-table"><thead><tr><th>순위</th><th>팀</th><th>경기</th><th>승</th><th>패</th><th>승점</th></tr></thead><tbody>'+data.teams.map(x=>`<tr class="${x.team==='OK저축은행'?'mine':''}"><td>${Number(x.rank)}</td><td>${escapeHTML(x.team)}</td><td>${Number(x.played)}</td><td>${Number(x.win)}</td><td>${Number(x.loss)}</td><td>${Number(x.points)}</td></tr>`).join('')+'</tbody></table>';
     if(manual){
       const checked=new Date().toLocaleTimeString('ko-KR',{timeZone:KST});
-      el('rankingFeedback').textContent=changed?`✅ ${checked} 새로운 순위 데이터를 불러왔어요!`:`✅ ${checked} 다시 확인했어요. GitHub 최신 저장 자료와 동일해요 (공식 순위 수집은 약 2시간 간격).`;
+      el('rankingFeedback').textContent=changed?`✅ ${checked} 새로운 순위 데이터를 불러왔어요!`:`✅ ${checked} 다시 확인했어요. 최신 저장 자료와 동일해요 (공식 순위 수집은 약 2시간 간격).`;
     }
   }catch(e){el('rankingFeedback').textContent='⚠️ 순위를 새로 확인하지 못했어요: '+e.message}
   finally{btn.disabled=false;btn.textContent='🔄 순위 다시 확인'}
@@ -669,7 +669,7 @@ async function load(manual=false){
     draw();syncAllAttending();checkPopup();
     if(manual){
       if(changed)popup('✅ 업데이트 되었습니다.',`${count}개 경기의 일정 또는 결과가 변경되어 반영됐어요. 선예매 날짜도 새 일정 기준으로 계산돼요.`,false);
-      else popup('📅 변경사항이 없습니다.','GitHub에 마지막으로 저장된 공식 경기표와 동일해요. 공식 홈페이지 비교는 약 1시간마다 자동 실행돼요.',false);
+      else popup('📅 변경사항이 없습니다.','마지막으로 저장된 공식 경기표와 동일해요. 공식 홈페이지 비교는 약 1시간마다 자동 실행돼요.',false);
     }
   }catch(e){
     if(!games.length)el('games').textContent='일정을 불러오지 못했습니다: '+e.message;
