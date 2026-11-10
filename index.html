@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ff8f2b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="읏맨 배구알림">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>읏맨 배구 선예매 알림</title>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<style>
+:root{
+  font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
+  --bg1:#fff4df;
+  --bg2:#ffe4bb;
+  --accent:#ff8f2b;
+  --accent2:#ffb347;
+  --accent3:#ff6d1f;
+  --navy:#5b3417;
+  --text:#40240f;
+  --card:#fffdf8;
+  --line:#ffd6a5;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  min-height:100vh;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 20% 15%, #ffffffa8 0 8%, transparent 9%),
+    radial-gradient(circle at 78% 9%, #fff7 0 7%, transparent 8%),
+    linear-gradient(180deg, var(--bg1), var(--bg2));
+}
+body::before,
+body::after{
+  content:"";
+  position:fixed;
+  border-radius:50%;
+  z-index:0;
+  pointer-events:none;
+  opacity:.18;
+  background:
+    radial-gradient(circle at center, transparent 55%, #ff9e43 57% 61%, transparent 63%),
+    radial-gradient(circle at center, transparent 32%, #ff9e43 34% 36%, transparent 38%);
+}
+body::before{width:220px;height:220px;left:-70px;bottom:60px;transform:rotate(-12deg)}
+body::after{width:180px;height:180px;right:-50px;top:90px;transform:rotate(18deg)}
+.wrap{position:relative;z-index:1;max-width:580px;margin:auto;padding:20px 16px 80px}
+header{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:6px 2px 0;
+}
+.brand-wrap{display:flex;flex-direction:column;gap:3px}
+.brand{font-weight:900;font-size:25px;letter-spacing:-.3px;color:#7f3c00}
+.brand-sub{font-size:12px;font-weight:800;color:#a85a16}
+.tag{
+  background:#fff3e5;color:#c85d00;border:1px solid #ffc987;
+  font-size:12px;font-weight:900;padding:7px 10px;border-radius:999px;
+  box-shadow:0 6px 14px #ffb55a33;
+}
+.hero{
+  position:relative;overflow:hidden;border-radius:28px;
+  background:linear-gradient(135deg,#ffb24c,#ff8f2b 55%,#ff772d);
+  padding:24px 22px;margin:20px 0 22px;color:#fff;
+  box-shadow:0 20px 35px #ff9d3c55;
+}
+.hero::before{
+  content:"🏐";
+  position:absolute;right:18px;top:12px;font-size:62px;opacity:.18;transform:rotate(14deg)
+}
+.hero-top{display:inline-flex;align-items:center;gap:8px;background:#ffffff33;border:1px solid #ffffff47;border-radius:999px;padding:7px 12px;font-size:12px;font-weight:800}
+.hero h1{font-size:31px;margin:12px 0 8px;line-height:1.16;letter-spacing:-.6px}
+.hero p{font-size:14px;margin:0;line-height:1.6;color:#fff8ef;font-weight:600}
+.hero .mini{margin-top:12px;font-size:12px;font-weight:800;color:#fff4d8}
+.sectiontitle{font-weight:900;font-size:19px;margin:24px 0 12px;color:#7a420f}
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.button, .link-button{
+  appearance:none;text-decoration:none;
+  background:#fff7ee;color:#7b410f;border:1px solid #ffc98b;
+  border-radius:14px;padding:12px 15px;font-size:14px;font-weight:800;cursor:pointer;
+  box-shadow:0 8px 18px #ffbe7430;
+}
+.button.primary{background:linear-gradient(135deg,#ff9f32,#ff7e1f);border-color:#ff8c28;color:#fff}
+.button:disabled{opacity:.55}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:22px;padding:18px;margin:12px 0;
+  box-shadow:0 10px 24px #efb56b22;
+}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.date{font-weight:900;font-size:20px;color:#7f3c00}
+.home-badge{
+  background:#fff1df;color:#c35d03;border:1px solid #ffc47b;
+  font-size:12px;font-weight:900;padding:7px 10px;border-radius:999px;
+}
+.sub{color:#86562d;font-size:13px;margin-top:8px;font-weight:700}
+.ticket{
+  background:#fff3e0;border:1px solid #ffd39e;border-radius:14px;padding:12px;margin-top:14px;
+  color:#7b400c;font-size:14px;line-height:1.5;font-weight:700
+}
+.ticket strong{color:#ff6c16}
+.ticket.soon{background:#fff0d2;border-color:#ffbc68}
+.ticket.past{opacity:.72}
+.small{font-size:12px;color:#8c6139;line-height:1.7}
+.empty{padding:20px;color:#96633a;background:#fffaf2;border:1px dashed #ffc987;border-radius:16px;margin-top:12px}
+.modal-backdrop{position:fixed;inset:0;background:#6b3b1270;display:none;align-items:center;justify-content:center;padding:20px;z-index:99}
+.modal{
+  max-width:365px;width:100%;padding:24px;border-radius:24px;
+  background:linear-gradient(180deg,#fffaf3,#ffe7c4);box-shadow:0 20px 48px #71380055;border:1px solid #ffd29d
+}
+.modal h2{margin:0 0 10px;color:#7d4008}.modal p{color:#6b3b13;line-height:1.6;font-weight:700}
+a{color:#c85c00}
+select{background:#fffaf3;color:#6f3b13;border:1px solid #ffc987;border-radius:14px;padding:11px 12px;font-weight:700}
+#status{min-height:36px;padding-left:2px}
+.footer-note{margin-top:14px}
+.check-row{display:flex;align-items:center;gap:8px}
+.check-row input{accent-color:#ff8b27}
+@media (max-width:480px){
+  .hero h1{font-size:28px}
+  .brand{font-size:23px}
+  .button,.link-button{width:100%;justify-content:center;text-align:center}
+  .controls > *{flex:1 1 100%}
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header>
+    <div class="brand-wrap">
+      <div class="brand">🏐 읏맨 배구 알리미</div>
+      <div class="brand-sub">OK저축은행 읏맨 홈경기 선예매 전용 앱</div>
+    </div>
+    <span class="tag">밝은 배구앱</span>
+  </header>
+
+  <section class="hero">
+    <div class="hero-top">🏐 2026–2027 V-리그 · OK저축은행 읏맨</div>
+    <h1>배구 선예매<br>ㄱㄱㄱㄱㄱ</h1>
+    <p>홈경기 일정, 선예매 시작 시각, 잠금 화면 푸시 알림까지 한 번에 확인해요.</p>
+    <div class="mini">경기 D-7 오전 11시 · 10분 전 + 정각 푸시 알림</div>
+  </section>
+
+  <div class="sectiontitle">알림 설정</div>
+  <div class="controls">
+    <button class="button primary" id="enable">🔔 잠금 화면 알림 켜기</button>
+    <button class="button" id="check">🔄 일정 새로고침</button>
+  </div>
+  <p id="status" class="small">아이폰에서는 Safari에서 공유 → 홈 화면에 추가 후 앱을 열어 알림을 허용하세요.</p>
+
+  <div class="sectiontitle">홈경기 일정</div>
+  <div class="controls">
+    <select id="filter" aria-label="경기 필터">
+      <option value="upcoming">예정 경기</option>
+      <option value="all">전체 경기</option>
+    </select>
+    <a class="link-button" href="https://www.kovo.co.kr/" target="_blank" rel="noopener">🎟️ 공식 예매 사이트 바로가기</a>
+  </div>
+
+  <div id="games" aria-live="polite"></div>
+  <p class="small footer-note">※ 홈경기만 표시합니다. 일정은 <code>schedule.json</code>에 등록한 경기 기준이며, 경기 변경 시 파일을 수정해야 합니다. 예매 정책과 경기 정보는 공식 사이트에서 최종 확인해 주세요. 푸시 전송은 서버 설정이 완료돼야 작동합니다.</p>
+</main>
+
+<div class="modal-backdrop" id="popup" role="dialog" aria-modal="true" aria-labelledby="popTitle">
+  <div class="modal">
+    <h2 id="popTitle">🏐 배구 선예매 알림</h2>
+    <p id="popText"></p>
+    <div class="controls">
+      <a class="button primary" href="https://www.kovo.co.kr/" target="_blank" rel="noopener">예매하러 가기</a>
+      <button class="button" id="close">닫기</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// 설정: OneSignal에서 발급받은 공개 App ID만 입력합니다. REST API Key는 절대로 넣지 마세요.
+const ONESIGNAL_APP_ID = '여기에_OneSignal_APP_ID';
+const KST='Asia/Seoul';
+let games=[];
+const el=id=>document.getElementById(id);
+function parsed(date,time){return new Date(`${date}T${time}:00+09:00`)}
+function bookingDate(g){return new Date(parsed(g.date,'11:00').getTime()-7*86400000)}
+function fmt(d,includeTime=true){return new Intl.DateTimeFormat('ko-KR',{timeZone:KST,year:'numeric',month:'long',day:'numeric',weekday:'short',...(includeTime?{hour:'2-digit',minute:'2-digit',hour12:false}:{})}).format(d)}
+function escapeHTML(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function gameCard(g){
+  const buy=bookingDate(g),now=new Date(),passed=buy<=now,imminent=buy.getTime()-now.getTime()<86400000&&!passed;
+  return `<article class="card"><div class="top"><div class="date">🏐 ${escapeHTML(g.opponent)}전</div><span class="home-badge">HOME</span></div><div class="sub">📅 ${fmt(parsed(g.date,g.time))}</div><div class="sub">📍 ${escapeHTML(g.venue||'장소 확인 필요')}</div><div class="ticket ${passed?'past':imminent?'soon':''}">🎟️ 선예매 <strong>${fmt(buy)}</strong><br>${passed?'선예매 오픈 시각 지남':imminent?'24시간 이내 시작':'경기 7일 전 오전 11시'}</div><div class="controls" style="margin-top:12px"><button class="button" data-calendar="${escapeHTML(g.id)}">📅 캘린더 등록</button><label class="button check-row"><input type="checkbox" data-booked="${escapeHTML(g.id)}" ${localStorage.getItem('booked_'+g.id)==='1'?'checked':''}> 예매 완료</label></div></article>`
+}
+function draw(){
+  const now=new Date(),f=el('filter').value;
+  let rows=games.filter(g=>g.home!==false&&(f==='all'||parsed(g.date,g.time)>=now));
+  rows.sort((a,b)=>parsed(a.date,a.time)-parsed(b.date,b.time));
+  el('games').innerHTML=rows.map(gameCard).join('')||'<div class="empty">등록된 예정 홈경기가 없어요.</div>';
+  document.querySelectorAll('[data-booked]').forEach(n=>n.addEventListener('change',()=>localStorage.setItem('booked_'+n.dataset.booked,n.checked?'1':'0')));
+  document.querySelectorAll('[data-calendar]').forEach(n=>n.addEventListener('click',()=>downloadICS(games.find(g=>g.id===n.dataset.calendar))));
+}
+function utcICS(d){return d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z')}
+function downloadICS(g){
+  if(!g)return;
+  const t=bookingDate(g),end=new Date(t.getTime()+10*60000),esc=v=>String(v).replace(/\\/g,'\\\\').replace(/,/g,'\\,').replace(/;/g,'\\;').replace(/\n/g,'\\n');
+  const content=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//OK Ticket Alert//KR','BEGIN:VEVENT','UID:'+g.id+'-booking@local','DTSTAMP:'+utcICS(new Date()),'DTSTART:'+utcICS(t),'DTEND:'+utcICS(end),'SUMMARY:'+esc('읏맨 선예매: '+g.opponent),'DESCRIPTION:'+esc('경기 '+g.date+' '+g.time+' / https://www.kovo.co.kr/'),'BEGIN:VALARM','TRIGGER:-PT10M','ACTION:DISPLAY','DESCRIPTION:선예매 10분 전','END:VALARM','END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const url=URL.createObjectURL(new Blob([content],{type:'text/calendar;charset=utf-8'}));
+  const a=document.createElement('a');a.href=url;a.download='eutman-'+g.date+'.ics';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000)
+}
+function popup(msg){el('popText').textContent=msg;el('popup').style.display='flex'}
+function checkPopup(){
+  const now=Date.now(),key='popup_'+new Date().toLocaleDateString('en-CA',{timeZone:KST});
+  for(const g of games){
+    const t=bookingDate(g).getTime(),delta=now-t,phase=delta<0?'before':'open',popupKey=key+g.id+'_'+phase;
+    if(delta>=-600000&&delta<3600000&&localStorage.getItem(popupKey)!=='1'&&localStorage.getItem('booked_'+g.id)!=='1'){
+      popup(`${g.opponent}전 선예매 ${delta<0?'10분 전! 배구 선예매 ㄱㄱㄱㄱㄱ':'시작! 지금 바로 예매하러 가도 돼요.'}`);
+      localStorage.setItem(popupKey,'1');
+      break;
+    }
+  }
+}
+async function load(){
+  try{
+    const r=await fetch('./schedule.json?v='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw Error('HTTP '+r.status);
+    const list=await r.json();
+    if(!Array.isArray(list))throw Error('형식 오류');
+    games=list.filter(g=>/^\d{4}-\d{2}-\d{2}$/.test(g.date)&&/^\d{2}:\d{2}$/.test(g.time)&&g.id&&g.opponent);
+    draw();checkPopup()
+  }catch(e){el('games').textContent='일정을 불러오지 못했습니다: '+e.message}
+}
+window.OneSignalDeferred=window.OneSignalDeferred||[];
+if(ONESIGNAL_APP_ID.startsWith('여기에')){
+  el('status').textContent='푸시 알림 설정 전입니다. index.html에 OneSignal App ID를 입력하세요.'
+}else{
+  window.OneSignalDeferred.push(async OneSignal=>{
+    try{
+      const scope=new URL('./',location.href).pathname;
+      await OneSignal.init({appId:ONESIGNAL_APP_ID,serviceWorkerPath:scope+'OneSignalSDKWorker.js',serviceWorkerParam:{scope},notifyButton:{enable:false},allowLocalhostAsSecureOrigin:false});
+      el('status').textContent='알림 사용 가능: 버튼을 눌러 권한을 허용하세요.';
+      el('enable').onclick=async()=>{
+        try{
+          await OneSignal.Notifications.requestPermission();
+          await OneSignal.User.PushSubscription.optIn();
+          el('status').textContent=OneSignal.User.PushSubscription.optedIn?'✅ 잠금 화면 알림 구독 완료':'알림 권한이 허용되지 않았어요. 아이폰 알림 설정을 확인하세요.'
+        }catch(e){el('status').textContent='알림 설정 실패: '+e.message}
+      }
+    }catch(e){el('status').textContent='OneSignal 초기화 실패: '+e.message}
+  });
+}
+el('filter').onchange=draw;
+el('check').onclick=load;
+el('close').onclick=()=>el('popup').style.display='none';
+el('popup').onclick=e=>{if(e.target===el('popup'))el('popup').style.display='none'};
+load();
+setInterval(()=>{if(games.length)checkPopup()},30000);
+</script>
+</body>
+</html>

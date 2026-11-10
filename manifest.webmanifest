@@ -1,0 +1,14 @@
+{
+  "name": "읏맨 배구 선예매 알림",
+  "short_name": "읏맨 배구알림",
+  "description": "OK저축은행 읏맨 홈경기와 D-7 오전 11시 선예매 알림",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fff4df",
+  "theme_color": "#ff8f2b",
+  "icons": [
+    {"src":"icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"icon-512.png","sizes":"512x512","type":"image/png"}
+  ]
+}
