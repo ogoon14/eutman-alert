@@ -453,7 +453,7 @@ el('enable').addEventListener('click',async()=>{
     if(done){
       syncAllAttending();
       pushStatus('✅ 잠금 화면 푸시 알림 구독 완료!');
-      popup('🔔 알림 구독 완료','선예매 알림과 예매 완료한 경기의 2시간 전 직관 알림을 받을 수 있도록 설정했어요. (Apps Script의 최신 Code.gs 적용 필요)',false);
+      popup('🔔 알림 구독 완료','선예매 알림과 예매 완료한 경기의 2시간 전 직관 알림을 받을 수 있도록 설정했어요.',false);
     }else pushStatus('⚠️ 구독이 완료되지 않았어요. 새로고침 후 다시 시도해 주세요.');
   }catch(error){pushStatus('⚠️ 알림 설정 오류: '+(error?.message||String(error)))}
 });
