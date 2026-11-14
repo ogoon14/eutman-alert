@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-11-13",
-  "fetchedAt": "2026-11-13T22:24+09:00",
+  "asOf": "2026-11-14",
+  "fetchedAt": "2026-11-14T17:59+09:00",
   "season": "2026-2027",
   "source": "https://www.okfinancialsports.com/volleyball/game/team_ranking.asp",
   "teams": [
@@ -30,19 +30,19 @@
     },
     {
       "rank": 4,
-      "team": "대한항공",
-      "played": 3,
-      "win": 1,
+      "team": "삼성화재",
+      "played": 4,
+      "win": 2,
       "loss": 2,
-      "points": 4
+      "points": 6
     },
     {
       "rank": 5,
-      "team": "삼성화재",
-      "played": 3,
+      "team": "대한항공",
+      "played": 4,
       "win": 1,
-      "loss": 2,
-      "points": 3
+      "loss": 3,
+      "points": 4
     },
     {
       "rank": 6,
