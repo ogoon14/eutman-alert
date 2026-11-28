@@ -1,6 +1,6 @@
 {
-  "asOf": "2026-11-27",
-  "fetchedAt": "2026-11-27T22:53+09:00",
+  "asOf": "2026-11-28",
+  "fetchedAt": "2026-11-28T16:51+09:00",
   "season": "2026-2027",
   "source": "https://www.okfinancialsports.com/volleyball/game/team_ranking.asp",
   "teams": [
@@ -15,9 +15,9 @@
     {
       "rank": 2,
       "team": "한국전력",
-      "played": 7,
+      "played": 8,
       "win": 5,
-      "loss": 2,
+      "loss": 3,
       "points": 15
     },
     {
@@ -47,10 +47,10 @@
     {
       "rank": 6,
       "team": "OK저축은행",
-      "played": 6,
-      "win": 1,
+      "played": 7,
+      "win": 2,
       "loss": 5,
-      "points": 5
+      "points": 8
     },
     {
       "rank": 7,
